@@ -28,36 +28,56 @@ let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
 let auth: Auth | null = null;
 
-export function getFirebaseApp(): FirebaseApp {
+export function getFirebaseApp(): FirebaseApp | null {
   if (!app) {
-    if (getApps().length === 0) {
-      app = initializeApp(FIREBASE_CONFIG);
-    } else {
-      app = getApp();
+    try {
+      if (getApps().length === 0) {
+        app = initializeApp(FIREBASE_CONFIG);
+      } else {
+        app = getApp();
+      }
+    } catch (err) {
+      console.warn('Firebase App initialization warning:', err);
+      return null;
     }
   }
   return app;
 }
 
-export function getFirebaseAuth(): Auth {
+export function getFirebaseAuth(): Auth | null {
   if (!auth) {
-    const firebaseApp = getFirebaseApp();
-    auth = getAuth(firebaseApp);
+    try {
+      const firebaseApp = getFirebaseApp();
+      if (firebaseApp) {
+        auth = getAuth(firebaseApp);
+      }
+    } catch (err) {
+      console.warn('Firebase Auth initialization warning:', err);
+      return null;
+    }
   }
   return auth;
 }
 
-export function getFirebaseFirestore(): Firestore {
+export function getFirebaseFirestore(): Firestore | null {
   if (!db) {
-    const firebaseApp = getFirebaseApp();
-    const dbId = FIREBASE_CONFIG.firestoreDatabaseId;
     try {
-      // Force long-polling to prevent WebSocket/streaming connection errors in sandboxed iframes
-      db = initializeFirestore(firebaseApp, {
-        experimentalForceLongPolling: true,
-      }, dbId);
-    } catch {
-      db = getFirestore(firebaseApp, dbId);
+      const firebaseApp = getFirebaseApp();
+      if (!firebaseApp) return null;
+      const dbId = FIREBASE_CONFIG.firestoreDatabaseId;
+      try {
+        // Force long-polling to prevent WebSocket/streaming connection errors in sandboxed iframes
+        db = initializeFirestore(firebaseApp, {
+          experimentalForceLongPolling: true,
+        }, dbId);
+      } catch (initErr) {
+        // If initializeFirestore fails because the instance was already initialized, safely fall back to getFirestore()
+        console.warn('initializeFirestore fallback to getFirestore:', initErr instanceof Error ? initErr.message : initErr);
+        db = getFirestore(firebaseApp, dbId);
+      }
+    } catch (err) {
+      console.warn('Firebase Firestore initialization warning:', err);
+      return null;
     }
   }
   return db;
@@ -90,25 +110,28 @@ export interface FirestoreErrorInfo {
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const currentAuth = getFirebaseAuth();
-  const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: currentAuth.currentUser?.uid,
-      email: currentAuth.currentUser?.email,
-      emailVerified: currentAuth.currentUser?.emailVerified,
-      isAnonymous: currentAuth.currentUser?.isAnonymous,
-      tenantId: currentAuth.currentUser?.tenantId,
-      providerInfo: currentAuth.currentUser?.providerData?.map(provider => ({
-        providerId: provider.providerId,
-        email: provider.email,
-      })) || []
-    },
-    operationType,
-    path
-  };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  try {
+    const currentAuth = getFirebaseAuth();
+    const errInfo: FirestoreErrorInfo = {
+      error: error instanceof Error ? error.message : String(error),
+      authInfo: {
+        userId: currentAuth?.currentUser?.uid,
+        email: currentAuth?.currentUser?.email,
+        emailVerified: currentAuth?.currentUser?.emailVerified,
+        isAnonymous: currentAuth?.currentUser?.isAnonymous,
+        tenantId: currentAuth?.currentUser?.tenantId,
+        providerInfo: currentAuth?.currentUser?.providerData?.map(provider => ({
+          providerId: provider.providerId,
+          email: provider.email,
+        })) || []
+      },
+      operationType,
+      path
+    };
+    console.error('Firestore Error: ', JSON.stringify(errInfo));
+  } catch (e) {
+    console.error('Firestore error logging failed:', e);
+  }
 }
 
 /**
@@ -116,7 +139,12 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
  */
 export async function testFirestoreConnection(): Promise<boolean> {
   try {
+    // Safe browser check for offline status
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return false;
+    }
     const firestore = getFirebaseFirestore();
+    if (!firestore) return false;
     const testRef = doc(firestore, 'hotspots', 'VG-1042');
     
     // Attempt doc read with 3s timeout
@@ -124,9 +152,9 @@ export async function testFirestoreConnection(): Promise<boolean> {
     const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 3000));
     const result = await Promise.race([docPromise, timeoutPromise]);
     
-    return result !== null || navigator.onLine;
+    return result !== null;
   } catch (error) {
-    // If offline or network unavailable, fall back to browser online state
-    return typeof navigator !== 'undefined' ? navigator.onLine : true;
+    console.warn('Firestore health check failed:', error);
+    return false;
   }
 }
