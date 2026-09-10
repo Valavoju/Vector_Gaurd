@@ -1,0 +1,6 @@
+{
+  "name": "VectorGuard AI",
+  "description": "AI-Powered Predictive Vector Control Platform for proactive vector-breeding prevention and municipal decision support.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

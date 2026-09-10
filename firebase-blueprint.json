@@ -1,0 +1,228 @@
+{
+  "entities": {
+    "Hotspot": {
+      "title": "Hotspot",
+      "description": "Environmental stagnant water hotspot profile and risk metrics",
+      "type": "object",
+      "properties": {
+        "hotspot_id": { "type": "string" },
+        "state": { "type": "string" },
+        "city": { "type": "string" },
+        "local_area": { "type": "string" },
+        "ward": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "site_type": { "type": "string" },
+        "rainfall": { "type": "number" },
+        "temperature": { "type": "number" },
+        "humidity": { "type": "number" },
+        "drainage_condition": { "type": "string" },
+        "construction_activity": { "type": "string" },
+        "historical_risk": { "type": "number" },
+        "water_retention_prediction": { "type": "number" },
+        "visual_condition_score": { "type": "number" },
+        "environmental_score": { "type": "number" },
+        "risk_score": { "type": "number" },
+        "risk_level": { "type": "string" },
+        "imagery_source": { "type": "string" },
+        "imagery_access": { "type": "string" },
+        "visual_detection": { "type": "string" },
+        "recommended_action": { "type": "string" },
+        "status": { "type": "string" },
+        "assigned_team": { "type": "string" },
+        "assigned_officer": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["hotspot_id", "state", "city", "latitude", "longitude", "risk_score", "risk_level", "status"]
+    },
+    "WeatherObservation": {
+      "title": "WeatherObservation",
+      "description": "Location-specific meteorological observations and forecasts",
+      "type": "object",
+      "properties": {
+        "weather_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "observation_time": { "type": "string" },
+        "rainfall_24h": { "type": "number" },
+        "rainfall_48h": { "type": "number" },
+        "temperature": { "type": "number" },
+        "humidity": { "type": "number" },
+        "forecast_rainfall": { "type": "number" },
+        "forecast_temperature": { "type": "number" },
+        "forecast_humidity": { "type": "number" },
+        "source": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["weather_id", "hotspot_id", "temperature", "humidity", "source"]
+    },
+    "HistoricalRecord": {
+      "title": "HistoricalRecord",
+      "description": "Historical inspection, stagnation, and intervention observations",
+      "type": "object",
+      "properties": {
+        "historical_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "observation_date": { "type": "string" },
+        "previous_stagnation": { "type": "string" },
+        "previous_risk_score": { "type": "number" },
+        "inspection_result": { "type": "string" },
+        "intervention": { "type": "string" },
+        "recurrence": { "type": "string" },
+        "historical_rainfall": { "type": "number" },
+        "field_observation": { "type": "string" },
+        "verification_outcome": { "type": "string" },
+        "source": { "type": "string" }
+      },
+      "required": ["historical_id", "hotspot_id", "observation_date", "previous_risk_score", "source"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Municipal field intervention tasks and dispatch records",
+      "type": "object",
+      "properties": {
+        "task_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "assigned_team": { "type": "string" },
+        "assigned_officer": { "type": "string" },
+        "priority": { "type": "string" },
+        "deadline": { "type": "string" },
+        "status": { "type": "string" },
+        "created_at": { "type": "string" },
+        "started_at": { "type": "string" },
+        "completed_at": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["task_id", "hotspot_id", "status", "priority", "created_at"]
+    },
+    "Evidence": {
+      "title": "Evidence",
+      "description": "Photographic, aerial, officer, and citizen evidence records",
+      "type": "object",
+      "properties": {
+        "evidence_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "source_type": { "type": "string" },
+        "capture_type": { "type": "string" },
+        "image_reference": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "timestamp": { "type": "string" },
+        "altitude": { "type": "number" },
+        "camera_source": { "type": "string" },
+        "condition": { "type": "string" },
+        "description": { "type": "string" },
+        "verification_status": { "type": "string" },
+        "created_at": { "type": "string" }
+      },
+      "required": ["evidence_id", "hotspot_id", "source_type", "capture_type", "image_reference"]
+    },
+    "Verification": {
+      "title": "Verification",
+      "description": "Audit and human supervisor verifications of remediated hotspots",
+      "type": "object",
+      "properties": {
+        "verification_id": { "type": "string" },
+        "evidence_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "verified_by": { "type": "string" },
+        "verification_status": { "type": "string" },
+        "verification_notes": { "type": "string" },
+        "verified_at": { "type": "string" }
+      },
+      "required": ["verification_id", "evidence_id", "hotspot_id", "verification_status", "verified_at"]
+    },
+    "Intervention": {
+      "title": "Intervention",
+      "description": "Physical remediation operations executed on stagnant sites",
+      "type": "object",
+      "properties": {
+        "intervention_id": { "type": "string" },
+        "task_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "action_type": { "type": "string" },
+        "description": { "type": "string" },
+        "performed_by": { "type": "string" },
+        "performed_at": { "type": "string" },
+        "before_evidence_id": { "type": "string" },
+        "intervention_evidence_id": { "type": "string" },
+        "after_evidence_id": { "type": "string" },
+        "outcome": { "type": "string" }
+      },
+      "required": ["intervention_id", "task_id", "hotspot_id", "action_type", "performed_at"]
+    },
+    "LearningOutcome": {
+      "title": "LearningOutcome",
+      "description": "Ground-truth audit records for feedback calibration and continuous learning",
+      "type": "object",
+      "properties": {
+        "learning_id": { "type": "string" },
+        "hotspot_id": { "type": "string" },
+        "predicted_risk": { "type": "number" },
+        "observed_condition": { "type": "string" },
+        "intervention_outcome": { "type": "string" },
+        "verification_outcome": { "type": "string" },
+        "observation_date": { "type": "string" },
+        "calibration_status": { "type": "string" }
+      },
+      "required": ["learning_id", "hotspot_id", "predicted_risk", "observation_date", "calibration_status"]
+    },
+    "CitizenRegistration": {
+      "title": "CitizenRegistration",
+      "description": "Protected citizen sentinel registry with privacy masking",
+      "type": "object",
+      "properties": {
+        "citizen_registration_id": { "type": "string" },
+        "full_name": { "type": "string" },
+        "mobile_number": { "type": "string" },
+        "email": { "type": "string" },
+        "state": { "type": "string" },
+        "city": { "type": "string" },
+        "consent_recorded": { "type": "boolean" },
+        "registered_at": { "type": "string" }
+      },
+      "required": ["citizen_registration_id", "full_name", "mobile_number", "consent_recorded", "registered_at"]
+    }
+  },
+  "firestore": {
+    "/hotspots/{hotspotId}": {
+      "schema": "Hotspot",
+      "description": "VectorGuard municipal stagnant water hotspot records"
+    },
+    "/weather_observations/{weatherId}": {
+      "schema": "WeatherObservation",
+      "description": "Location-specific meteorological observations and radar readings"
+    },
+    "/historical_records/{historicalId}": {
+      "schema": "HistoricalRecord",
+      "description": "Historical inspection, stagnation, and intervention records"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Field officer remediation tasks"
+    },
+    "/evidence/{evidenceId}": {
+      "schema": "Evidence",
+      "description": "Persistent photographic and sensor evidence"
+    },
+    "/verifications/{verificationId}": {
+      "schema": "Verification",
+      "description": "Administrative sign-offs and verifications"
+    },
+    "/interventions/{interventionId}": {
+      "schema": "Intervention",
+      "description": "Remediation action details and before/after references"
+    },
+    "/learning_outcomes/{learningId}": {
+      "schema": "LearningOutcome",
+      "description": "Audit feedback data for predictive calibration"
+    },
+    "/citizen_registrations/{registrationId}": {
+      "schema": "CitizenRegistration",
+      "description": "Citizen sentinel registrations with masked PII"
+    }
+  }
+}
