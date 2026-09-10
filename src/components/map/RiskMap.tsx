@@ -110,7 +110,7 @@ export const RiskMap: React.FC = () => {
   const [basemapStyle, setBasemapStyle] = useState<BasemapStyle>('TERRAIN');
   const [isStarred, setIsStarred] = useState<boolean>(false);
   const [rightTab, setRightTab] = useState<RightPanelTab>('OVERVIEW');
-  const [isLegendExpanded, setIsLegendExpanded] = useState<boolean>(false);
+  const [isLegendExpanded, setIsLegendExpanded] = useState<boolean>(true);
   const [isMobilePanelOpen, setIsMobilePanelOpen] = useState<boolean>(false);
   const [isMobileFiltersExpanded, setIsMobileFiltersExpanded] = useState<boolean>(false);
 
@@ -219,11 +219,11 @@ export const RiskMap: React.FC = () => {
     };
   }, [currentHotspot.latitude, currentHotspot.longitude, currentHotspot.city, currentHotspot.ward, currentHotspot.location]);
 
-  // Filtered Hotspots based on top bar search & dropdowns
-  const filteredHotspots = useMemo(() => {
+  // Scoped Hotspots based on top bar search, state, city & status (for accurate dynamic statistics)
+  const scopedHotspots = useMemo(() => {
     return hotspots.filter(h => {
-      const state = h.state || 'Telangana';
-      const city = h.city || 'Hyderabad';
+      const state = (h.state || 'Telangana').trim().toLowerCase();
+      const city = (h.city || 'Hyderabad').trim().toLowerCase();
       const ward = h.ward || '';
       const id = h.hotspot_id || '';
       const loc = h.location || '';
@@ -232,25 +232,81 @@ export const RiskMap: React.FC = () => {
       const matchesSearch = !query || 
         id.toLowerCase().includes(query) ||
         loc.toLowerCase().includes(query) ||
-        city.toLowerCase().includes(query) ||
-        state.toLowerCase().includes(query) ||
+        city.includes(query) ||
+        state.includes(query) ||
         ward.toLowerCase().includes(query);
 
-      const matchesState = selectedState === 'ALL' || state === selectedState;
-      const matchesCity = selectedCity === 'ALL' || city === selectedCity;
-      const matchesRisk = selectedRisk === 'ALL' || h.risk_level === selectedRisk;
-      const matchesStatus = selectedStatus === 'ALL' || h.status === selectedStatus;
+      const matchesState = selectedState === 'ALL' || state === selectedState.trim().toLowerCase();
+      const matchesCity = selectedCity === 'ALL' || city === selectedCity.trim().toLowerCase();
 
-      return matchesSearch && matchesState && matchesCity && matchesRisk && matchesStatus;
+      const status = (h.status || 'OPEN').toUpperCase();
+      let matchesStatus = true;
+      if (selectedStatus !== 'ALL') {
+        if (selectedStatus === 'ACTIVE') {
+          matchesStatus = status === 'OPEN' || status === 'ASSIGNED' || status === 'IN_PROGRESS' || status === 'ACTIVE';
+        } else {
+          matchesStatus = status === selectedStatus;
+        }
+      }
+
+      return matchesSearch && matchesState && matchesCity && matchesStatus;
     });
-  }, [hotspots, searchQuery, selectedState, selectedCity, selectedRisk, selectedStatus]);
+  }, [hotspots, searchQuery, selectedState, selectedCity, selectedStatus]);
 
-  // Statistics for Legend
-  const criticalCount = useMemo(() => hotspots.filter(h => h.risk_level === 'CRITICAL').length || 13, [hotspots]);
-  const highCount = useMemo(() => hotspots.filter(h => h.risk_level === 'HIGH').length || 29, [hotspots]);
-  const moderateCount = useMemo(() => hotspots.filter(h => h.risk_level === 'MODERATE').length || 14, [hotspots]);
-  const lowCount = useMemo(() => hotspots.filter(h => h.risk_level === 'LOW').length || 9, [hotspots]);
-  const totalCount = hotspots.length || 65;
+  // Filtered Hotspots based on top bar search & all dropdowns (including Risk Level)
+  const filteredHotspots = useMemo(() => {
+    return scopedHotspots.filter(h => {
+      if (selectedRisk === 'ALL') return true;
+
+      const score = Math.round(Number(h.breeding_risk_score ?? (h as any).risk_score ?? 0));
+      let level = h.risk_level;
+      if (!level || !['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].includes(level.toUpperCase())) {
+        if (score >= 81) level = 'CRITICAL';
+        else if (score >= 61) level = 'HIGH';
+        else if (score >= 31) level = 'MODERATE';
+        else level = 'LOW';
+      } else {
+        level = level.toUpperCase() as any;
+      }
+
+      return level === selectedRisk;
+    });
+  }, [scopedHotspots, selectedRisk]);
+
+  // Dynamic Statistics for Legend calculated from actual dataset scoped to selected state/city/status/search
+  const criticalCount = useMemo(() => {
+    return scopedHotspots.filter(h => {
+      const score = Math.round(Number(h.breeding_risk_score ?? (h as any).risk_score ?? 0));
+      const lvl = (h.risk_level || (score >= 81 ? 'CRITICAL' : score >= 61 ? 'HIGH' : score >= 31 ? 'MODERATE' : 'LOW')).toUpperCase();
+      return lvl === 'CRITICAL';
+    }).length;
+  }, [scopedHotspots]);
+
+  const highCount = useMemo(() => {
+    return scopedHotspots.filter(h => {
+      const score = Math.round(Number(h.breeding_risk_score ?? (h as any).risk_score ?? 0));
+      const lvl = (h.risk_level || (score >= 81 ? 'CRITICAL' : score >= 61 ? 'HIGH' : score >= 31 ? 'MODERATE' : 'LOW')).toUpperCase();
+      return lvl === 'HIGH';
+    }).length;
+  }, [scopedHotspots]);
+
+  const moderateCount = useMemo(() => {
+    return scopedHotspots.filter(h => {
+      const score = Math.round(Number(h.breeding_risk_score ?? (h as any).risk_score ?? 0));
+      const lvl = (h.risk_level || (score >= 81 ? 'CRITICAL' : score >= 61 ? 'HIGH' : score >= 31 ? 'MODERATE' : 'LOW')).toUpperCase();
+      return lvl === 'MODERATE';
+    }).length;
+  }, [scopedHotspots]);
+
+  const lowCount = useMemo(() => {
+    return scopedHotspots.filter(h => {
+      const score = Math.round(Number(h.breeding_risk_score ?? (h as any).risk_score ?? 0));
+      const lvl = (h.risk_level || (score >= 81 ? 'CRITICAL' : score >= 61 ? 'HIGH' : score >= 31 ? 'MODERATE' : 'LOW')).toUpperCase();
+      return lvl === 'LOW';
+    }).length;
+  }, [scopedHotspots]);
+
+  const totalCount = useMemo(() => scopedHotspots.length, [scopedHotspots]);
 
   // Zoom handlers
   const handleZoomIndia = () => {
@@ -325,16 +381,14 @@ export const RiskMap: React.FC = () => {
     }
   };
 
-  // 1. Initialize Map Instance
+  // 1. Initialize Map Instance (National View Framing by default)
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    const initialLat = currentHotspot ? currentHotspot.latitude : 17.4156;
-    const initialLng = currentHotspot ? currentHotspot.longitude : 78.4350;
-
+    // Default National Framing (All India view)
     const map = L.map(mapContainerRef.current, {
-      center: [initialLat, initialLng],
-      zoom: 14,
+      center: [21.5000, 79.5000],
+      zoom: 5,
       zoomControl: false,
       attributionControl: false
     });
@@ -355,19 +409,30 @@ export const RiskMap: React.FC = () => {
     };
   }, []);
 
-  // 2. Render Markers & Teardrop GPS Pins
+  // 2. Render Markers & Teardrop GPS Pins for ALL Risk Levels (Critical, High, Moderate, Low)
   useEffect(() => {
     if (!mapInstanceRef.current || !markersGroupRef.current) return;
     markersGroupRef.current.clearLayers();
 
     filteredHotspots.forEach(hotspot => {
       const isSelected = hotspot.hotspot_id === currentHotspotId;
-      const isHero = hotspot.hotspot_id === 'VG-1042';
+      const score = Math.round(Number(hotspot.breeding_risk_score ?? (hotspot as any).risk_score ?? 0));
 
-      let pinColor = '#22c55e'; // LOW - green
-      if (hotspot.risk_level === 'CRITICAL') pinColor = '#ef4444'; // CRITICAL - red
-      else if (hotspot.risk_level === 'HIGH') pinColor = '#f97316'; // HIGH - orange
-      else if (hotspot.risk_level === 'MODERATE') pinColor = '#eab308'; // MODERATE - yellow
+      let level = hotspot.risk_level;
+      if (!level || !['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].includes(level.toUpperCase())) {
+        if (score >= 81) level = 'CRITICAL';
+        else if (score >= 61) level = 'HIGH';
+        else if (score >= 31) level = 'MODERATE';
+        else level = 'LOW';
+      } else {
+        level = level.toUpperCase() as any;
+      }
+
+      // Exact color encoding for all 4 risk levels
+      let pinColor = '#22c55e'; // LOW = 0–30 → GREEN GPS PIN
+      if (level === 'CRITICAL') pinColor = '#ef4444'; // CRITICAL = 81–100 → RED GPS PIN
+      else if (level === 'HIGH') pinColor = '#f97316'; // HIGH = 61–80 → ORANGE GPS PIN
+      else if (level === 'MODERATE') pinColor = '#eab308'; // MODERATE = 31–60 → AMBER/YELLOW GPS PIN
 
       const iconHtml = `
         <div class="relative cursor-pointer transition-transform duration-200 ${isSelected ? 'scale-125 z-50' : 'hover:scale-110 z-10'}">
@@ -379,7 +444,7 @@ export const RiskMap: React.FC = () => {
             <path d="M12 0 C5.373 0 0 5.373 0 12 C0 21 12 32 12 32 C12 32 24 21 24 12 C24 5.373 18.627 0 12 0 Z" fill="${pinColor}" stroke="#ffffff" stroke-width="2"/>
             <circle cx="12" cy="11" r="5" fill="#ffffff" />
             <text x="12" y="13.5" font-size="7" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="#0f172a">
-              ${hotspot.breeding_risk_score}
+              ${score}
             </text>
           </svg>
           <div class="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-1.5 py-0.5 rounded bg-slate-900/90 text-[9px] font-mono font-bold text-white whitespace-nowrap shadow-sm pointer-events-none border border-slate-700/80">
@@ -398,14 +463,15 @@ export const RiskMap: React.FC = () => {
       const marker = L.marker([hotspot.latitude, hotspot.longitude], { icon: customIcon });
       marker.on('click', () => {
         setSelectedHotspotId(hotspot.hotspot_id);
+        setSelectedDetailHotspotId?.(hotspot.hotspot_id);
         if (mapInstanceRef.current) {
-          mapInstanceRef.current.setView([hotspot.latitude, hotspot.longitude], 16, { animate: true });
+          mapInstanceRef.current.setView([hotspot.latitude, hotspot.longitude], 15, { animate: true });
         }
       });
 
       marker.addTo(markersGroupRef.current!);
     });
-  }, [filteredHotspots, currentHotspotId, setSelectedHotspotId]);
+  }, [filteredHotspots, currentHotspotId, setSelectedHotspotId, setSelectedDetailHotspotId]);
 
   return (
     <div className="w-full h-[calc(100vh-56px)] bg-[#f8fafc] text-slate-800 flex flex-col overflow-hidden relative select-none">
@@ -510,7 +576,7 @@ export const RiskMap: React.FC = () => {
             </button>
             
             <button
-              onClick={() => handleZoomState('Telangana')}
+              onClick={() => handleZoomState(selectedState !== 'ALL' ? selectedState : 'Telangana')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                 geoLevel === 'STATE'
                   ? 'bg-blue-600 text-white shadow-xs'
@@ -521,7 +587,20 @@ export const RiskMap: React.FC = () => {
             </button>
 
             <button
-              onClick={() => handleZoomCity('Hyderabad')}
+              onClick={() => {
+                if (selectedCity !== 'ALL') {
+                  handleZoomCity(selectedCity);
+                } else if (selectedState !== 'ALL') {
+                  const stateObj = ALL_INDIAN_STATES_AND_UTS.find(s => s.name === selectedState);
+                  if (stateObj && stateObj.cities.length > 0) {
+                    handleZoomCity(stateObj.cities[0].name);
+                  } else {
+                    handleZoomCity('Hyderabad');
+                  }
+                } else {
+                  handleZoomCity('Hyderabad');
+                }
+              }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                 geoLevel === 'CITY'
                   ? 'bg-blue-600 text-white shadow-xs'
@@ -581,7 +660,7 @@ export const RiskMap: React.FC = () => {
             </button>
             
             <button
-              onClick={() => handleZoomState('Telangana')}
+              onClick={() => handleZoomState(selectedState !== 'ALL' ? selectedState : 'Telangana')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition shrink-0 ${
                 geoLevel === 'STATE'
                   ? 'bg-blue-600 text-white shadow-xs'
@@ -592,7 +671,20 @@ export const RiskMap: React.FC = () => {
             </button>
 
             <button
-              onClick={() => handleZoomCity('Hyderabad')}
+              onClick={() => {
+                if (selectedCity !== 'ALL') {
+                  handleZoomCity(selectedCity);
+                } else if (selectedState !== 'ALL') {
+                  const stateObj = ALL_INDIAN_STATES_AND_UTS.find(s => s.name === selectedState);
+                  if (stateObj && stateObj.cities.length > 0) {
+                    handleZoomCity(stateObj.cities[0].name);
+                  } else {
+                    handleZoomCity('Hyderabad');
+                  }
+                } else {
+                  handleZoomCity('Hyderabad');
+                }
+              }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition shrink-0 ${
                 geoLevel === 'CITY'
                   ? 'bg-blue-600 text-white shadow-xs'

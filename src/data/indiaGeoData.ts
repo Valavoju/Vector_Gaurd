@@ -968,34 +968,91 @@ export function getCompleteHotspotsDataset(existingHotspots: HotspotRecord[]): H
   const existingIds = new Set<string>();
   const coveredStateCities = new Map<string, Set<string>>();
 
-  // 1. Add existing hotspots while filtering any pre-existing duplicates by ID
-  for (const h of existingHotspots) {
-    if (h && h.hotspot_id && !existingIds.has(h.hotspot_id)) {
-      existingIds.add(h.hotspot_id);
-      const stateKey = (h.state || '').trim().toLowerCase();
-      const cityKey = (h.city || '').trim().toLowerCase();
-      if (!coveredStateCities.has(stateKey)) {
-        coveredStateCities.set(stateKey, new Set());
-      }
-      coveredStateCities.get(stateKey)!.add(cityKey);
-      result.push(h);
+  // 1. Add and normalize existing hotspots while filtering any pre-existing duplicates by ID
+  for (const raw of existingHotspots) {
+    if (!raw || !raw.hotspot_id || existingIds.has(raw.hotspot_id)) continue;
+    existingIds.add(raw.hotspot_id);
+
+    const score = Math.round(Number(raw.breeding_risk_score ?? (raw as any).risk_score ?? (raw as any).breedingRiskScore ?? 0));
+    let level: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW';
+    if (raw.risk_level && ['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].includes(raw.risk_level.toUpperCase())) {
+      level = raw.risk_level.toUpperCase() as any;
+    } else {
+      if (score >= 81) level = 'CRITICAL';
+      else if (score >= 61) level = 'HIGH';
+      else if (score >= 31) level = 'MODERATE';
+      else level = 'LOW';
     }
+
+    const state = raw.state || 'Telangana';
+    const city = raw.city || 'Hyderabad';
+    const stateKey = state.trim().toLowerCase();
+    const cityKey = city.trim().toLowerCase();
+
+    if (!coveredStateCities.has(stateKey)) {
+      coveredStateCities.set(stateKey, new Set());
+    }
+    coveredStateCities.get(stateKey)!.add(cityKey);
+
+    const normalized: HotspotRecord = {
+      ...raw,
+      country: raw.country || 'India',
+      state,
+      city,
+      local_area: raw.local_area || raw.locality || `${city} Central`,
+      ward: raw.ward || `${city} Ward 01`,
+      ward_number: Number(raw.ward_number || 1),
+      location: raw.location || raw.local_area || `${city} Survey Site`,
+      locality: raw.locality || raw.local_area || `${city} Urban`,
+      latitude: Number(raw.latitude),
+      longitude: Number(raw.longitude),
+      rainfall: Number(raw.rainfall || 30),
+      temperature: Number(raw.temperature || 29),
+      humidity: Number(raw.humidity || 75),
+      drainage_condition: raw.drainage_condition || (level === 'CRITICAL' ? 'Severely Blocked' : level === 'HIGH' ? 'Poor' : 'Moderate'),
+      construction_activity: raw.construction_activity || 'None',
+      historical_risk: Number(raw.historical_risk ?? Math.max(0, score - 5)),
+      water_retention_prediction: Number(raw.water_retention_prediction ?? score),
+      visual_score: Number(raw.visual_score ?? (raw as any).visual_condition_score ?? score),
+      environmental_score: Number(raw.environmental_score ?? Math.max(0, score - 4)),
+      breeding_risk_score: score,
+      risk_level: level,
+      imagery_source: raw.imagery_source || 'TARGETED DRONE',
+      imagery_level: raw.imagery_level || 'LEVEL_3_DRONE',
+      visual_detection: raw.visual_detection || `${raw.site_type || 'Site'} stormwater retention`,
+      cv_result: raw.cv_result || {
+        detectedCondition: level === 'CRITICAL' ? 'CRITICAL STAGNATION DETECTED' : 'SURFACE WATER RETENTION',
+        confidence: 90,
+        tags: ['Standing Water', 'Runoff Pool'],
+        boundingAreaDescription: `${city} drainage area (~60 sq.m)`,
+        surfaceType: 'Earth and masonry drainage channel',
+        estimatedAreaSqMeters: 60
+      },
+      recommended_action: raw.recommended_action || (level === 'CRITICAL' ? 'Immediate de-watering + larvicide application' : 'Routine de-silting and larvicide spraying'),
+      status: raw.status || 'OPEN',
+      assigned_team: raw.assigned_team || null,
+      assigned_officer: raw.assigned_officer || null,
+      assigned_officer_id: raw.assigned_officer_id || null,
+      site_type: raw.site_type || 'Stormwater Drain',
+      before_image_url: raw.before_image_url || DEMO_EVIDENCE_IMAGES.vg1042_before,
+      after_image_url: raw.after_image_url || DEMO_EVIDENCE_IMAGES.vg1042_after,
+      created_at: raw.created_at || '2026-09-08T06:00:00Z',
+      updated_at: raw.updated_at || '2026-09-08T07:00:00Z'
+    };
+    result.push(normalized);
   }
 
-  let nextIdCounter = 1050;
+  let nextIdCounter = 1060;
 
-  // 2. Iterate through all 28 States and 8 UTs
+  // 2. Iterate through all 28 States and 8 UTs (every city without truncating)
   ALL_INDIAN_STATES_AND_UTS.forEach(stateInfo => {
     const stateKey = stateInfo.name.trim().toLowerCase();
     const existingCitiesForState = coveredStateCities.get(stateKey) || new Set<string>();
 
-    // Representative cities to populate (up to 4-5 cities per state)
-    const targetCities = stateInfo.cities.slice(0, 5);
-
-    targetCities.forEach((cityInfo, index) => {
+    stateInfo.cities.forEach((cityInfo, index) => {
       const cityKey = cityInfo.name.trim().toLowerCase();
 
-      // If this city already has a hotspot in this state, keep it
+      // If this city already has a hotspot in this state, keep existing
       if (existingCitiesForState.has(cityKey)) {
         return;
       }
@@ -1013,16 +1070,28 @@ export function getCompleteHotspotsDataset(existingHotspots: HotspotRecord[]): H
       const newId = `VG-${nextIdCounter++}`;
       existingIds.add(newId);
 
-      // Deterministic yet varied realistic risk scoring based on city vulnerability
-      let baseScore = 65;
-      if (cityInfo.monsoonVulnerability === 'Critical') baseScore = 80 + (index % 8);
-      else if (cityInfo.monsoonVulnerability === 'High') baseScore = 68 + (index % 12);
-      else if (cityInfo.monsoonVulnerability === 'Moderate') baseScore = 52 + (index % 10);
-      else baseScore = 38 + (index % 10);
+      // Deterministic, balanced risk scoring ensuring all 4 risk levels exist in every state
+      let baseScore = 50;
+      const riskTier = index % 4;
+      if (riskTier === 0) {
+        // CRITICAL: 81-100 (Red)
+        baseScore = 82 + ((index * 3) % 13); // 82 to 94
+      } else if (riskTier === 1) {
+        // HIGH: 61-80 (Orange)
+        baseScore = 63 + ((index * 2) % 16); // 63 to 78
+      } else if (riskTier === 2) {
+        // MODERATE: 31-60 (Amber/Yellow)
+        baseScore = 36 + ((index * 3) % 22); // 36 to 57
+      } else {
+        // LOW: 0-30 (Green)
+        baseScore = 14 + ((index * 2) % 15); // 14 to 28
+      }
 
       const isCritical = baseScore >= 81;
       const isHigh = baseScore >= 61 && baseScore < 81;
       const isModerate = baseScore >= 31 && baseScore < 61;
+      const riskLevel: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW' = 
+        isCritical ? 'CRITICAL' : isHigh ? 'HIGH' : isModerate ? 'MODERATE' : 'LOW';
 
       // Realistic site types & descriptions based on index
       const siteTypes: Array<HotspotRecord['site_type']> = [
@@ -1045,43 +1114,53 @@ export function getCompleteHotspotsDataset(existingHotspots: HotspotRecord[]): H
         ward_number: index + 1,
         location: `${cityInfo.name} ${selectedSiteType} Sump #${index + 1}`,
         locality: `${cityInfo.district || cityInfo.name} Urban`,
-        latitude: Number((cityInfo.lat + (index === 0 ? 0 : (index * 0.006 * (index % 2 === 0 ? 1 : -1)))).toFixed(5)),
-        longitude: Number((cityInfo.lng + (index === 0 ? 0 : (index * 0.006 * (index % 2 === 1 ? 1 : -1)))).toFixed(5)),
-        rainfall: 30 + (index * 6),
+        latitude: Number(cityInfo.lat),
+        longitude: Number(cityInfo.lng),
+        rainfall: 20 + (index * 4),
         temperature: 28.5 + (index % 3),
-        humidity: 78 + (index % 10),
-        drainage_condition: isCritical ? 'Severely Blocked' : isHigh ? 'Poor' : 'Moderate',
+        humidity: 72 + (index % 15),
+        drainage_condition: isCritical ? 'Severely Blocked' : isHigh ? 'Poor' : isModerate ? 'Moderate' : 'Good',
         construction_activity: selectedSiteType === 'Construction Site' ? 'Active Excavation' : 'None',
-        historical_risk: baseScore - 6,
+        historical_risk: Math.max(0, baseScore - 5),
         water_retention_prediction: baseScore,
-        visual_score: baseScore + 4,
-        environmental_score: baseScore - 2,
+        visual_score: baseScore,
+        environmental_score: Math.max(0, baseScore - 2),
         breeding_risk_score: baseScore,
-        risk_level: isCritical ? 'CRITICAL' : isHigh ? 'HIGH' : isModerate ? 'MODERATE' : 'LOW',
+        risk_level: riskLevel,
         imagery_source: 'Targeted drone survey (DEMO / PILOT DATA — ILLUSTRATIVE)',
         imagery_level: 'LEVEL_3_DRONE',
-        visual_detection: `${selectedSiteType} retaining surface runoff in low-gradient basin`,
+        visual_detection: `${selectedSiteType} retaining surface runoff in municipal basin`,
         cv_result: {
-          detectedCondition: isCritical ? 'CRITICAL STAGNATION & FOUNDATION SUMP' : 'SURFACE RUNOFF RETENTION',
+          detectedCondition: isCritical 
+            ? 'CRITICAL STAGNATION & FOUNDATION SUMP' 
+            : isHigh 
+            ? 'ELEVATED RUNOFF PONDING DETECTED'
+            : isModerate
+            ? 'MODERATE SURFACE WATER RETENTION'
+            : 'NORMAL RUNOFF DISSIPATION PROFILE',
           confidence: 88 + (index % 8),
           tags: ['Standing Water', selectedSiteType, 'Monsoon Runoff', 'Drainage Sump'],
           supportingObservations: [
-            'Visible standing water accumulation',
-            'Low natural gradient runoff collection',
-            'Sediment and debris accumulation'
+            'Visible municipal basin drainage line',
+            'Runoff retention pattern recorded',
+            'Sediment and surface water observation'
           ],
-          boundingAreaDescription: `${cityInfo.name} municipal collector basin depression (~${80 + index * 15} sq.m)`,
+          boundingAreaDescription: `${cityInfo.name} collector depression (~${60 + index * 10} sq.m)`,
           surfaceType: selectedSiteType === 'Construction Site' ? 'Excavated soil foundation' : 'Asphalt and earth verge',
-          estimatedAreaSqMeters: 80 + index * 15
+          estimatedAreaSqMeters: 60 + index * 10
         },
         recommended_action: isCritical 
           ? 'Urgent de-watering + debris clearance + Bti larvicide application' 
-          : 'Channel desilting + prophylactic larvicide application',
+          : isHigh
+          ? 'Channel desilting + prophylactic larvicide application'
+          : isModerate
+          ? 'Routine de-silting and bi-weekly vector surveillance'
+          : 'Baseline monthly survey; no immediate intervention required',
         status: 'OPEN',
         assigned_team: null,
         assigned_officer: null,
         assigned_officer_id: null,
-        ai_explanation: `AI detected elevated water retention risk in ${cityInfo.name}, ${stateInfo.name} due to ${cityInfo.monsoonVulnerability.toLowerCase()} monsoon vulnerability and low-gradient drainage terrain.`,
+        ai_explanation: `AI evaluated water retention risk in ${cityInfo.name}, ${stateInfo.name} with score ${baseScore}/100 (${riskLevel}).`,
         site_type: selectedSiteType,
         before_image_url: DEMO_EVIDENCE_IMAGES.vg1042_before,
         after_image_url: DEMO_EVIDENCE_IMAGES.vg1042_after,
