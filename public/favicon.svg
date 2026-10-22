@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .tile { fill: #ffffff; }
+    .edge { stroke: #bcd6ff; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: #1b1c20; }
+      .edge { stroke: #3a3b41; }
+    }
+  </style>
+  <defs>
+    <linearGradient id="a" x1="6" y1="14" x2="34" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1a4dff"/><stop offset=".55" stop-color="#1463ff"/><stop offset="1" stop-color="#0a1f8f"/>
+    </linearGradient>
+    <linearGradient id="b" x1="58" y1="10" x2="30" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22e0f0"/><stop offset=".5" stop-color="#1a8cff"/><stop offset="1" stop-color="#0b3be0"/>
+    </linearGradient>
+  </defs>
+  <rect class="tile" width="64" height="64" rx="15"/>
+  <rect class="edge" x=".75" y=".75" width="62.5" height="62.5" rx="14.25" fill="none" stroke-width="1.5"/>
+  <g transform="translate(5 4.5) scale(.86)">
+    <path d="M3 17h13.5l17.2 29.6-4.6 10.4z" fill="url(#a)"/>
+    <path d="M29.1 57C45 49.5 55 36 60.5 17.5L43 8.5 24.5 18.5l5.6 11.2 4.6-9.2 4.8-2.6 10.4 3.8C46 33 39.5 45 29.1 57z" fill="url(#b)"/>
+  </g>
+</svg>

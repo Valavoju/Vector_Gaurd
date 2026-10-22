@@ -53,7 +53,7 @@ export const CitizenSubmissionStatus: React.FC<CitizenSubmissionStatusProps> = (
 
       {/* Main Submission Details Card */}
       {activeItem && (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-6">
+        <div className="bg-card rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-6">
           
           {/* Header Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
@@ -106,15 +106,15 @@ export const CitizenSubmissionStatus: React.FC<CitizenSubmissionStatusProps> = (
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="bg-white p-2.5 rounded-lg border border-slate-200/80">
+              <div className="bg-card p-2.5 rounded-lg border border-slate-200/80">
                 <div className="text-[10px] text-slate-400 font-bold">CITIZEN IDENTITY</div>
                 <div className="font-mono font-bold text-slate-900 mt-0.5">{activeItem.citizenNameMasked}</div>
               </div>
-              <div className="bg-white p-2.5 rounded-lg border border-slate-200/80">
+              <div className="bg-card p-2.5 rounded-lg border border-slate-200/80">
                 <div className="text-[10px] text-slate-400 font-bold">MOBILE (MASKED)</div>
                 <div className="font-mono font-bold text-slate-900 mt-0.5">{activeItem.citizenMobileMasked}</div>
               </div>
-              <div className="bg-white p-2.5 rounded-lg border border-slate-200/80">
+              <div className="bg-card p-2.5 rounded-lg border border-slate-200/80">
                 <div className="text-[10px] text-slate-400 font-bold">EMAIL (MASKED)</div>
                 <div className="font-mono font-bold text-slate-900 mt-0.5 truncate">
                   {activeItem.citizenEmailMasked || 'N/A'}
@@ -136,7 +136,7 @@ export const CitizenSubmissionStatus: React.FC<CitizenSubmissionStatusProps> = (
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
-                <span className="absolute top-2 left-2 bg-slate-950/80 text-white font-mono text-[9px] px-2 py-0.5 rounded backdrop-blur-xs">
+                <span className="vg-island absolute top-2 left-2 bg-slate-950/80 text-white font-mono text-[9px] px-2 py-0.5 rounded backdrop-blur-xs">
                   {activeItem.evidenceType}
                 </span>
               </div>
@@ -233,7 +233,7 @@ export const CitizenSubmissionStatus: React.FC<CitizenSubmissionStatusProps> = (
 
       {/* History of Previous Submissions */}
       {allSubmissions.length > 1 && (
-        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-3">
+        <div className="bg-card rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-3">
           <div className="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
             All Submissions in Current Demo Session ({allSubmissions.length})
           </div>

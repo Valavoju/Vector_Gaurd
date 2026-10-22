@@ -119,15 +119,15 @@ export const RealtimeGpsIndicator: React.FC<RealtimeGpsIndicatorProps> = ({
   const geofenceDistanceMeters = isInspecting ? 6 : isAwaitingVerification ? 0 : 24;
 
   return (
-    <div className="bg-[#090e1d] text-slate-100 rounded-lg p-3 border border-slate-800 shadow-md space-y-2.5 font-mono text-xs">
+    <div className="bg-card text-slate-900 rounded-xl p-3.5 border border-slate-200 shadow-md space-y-2.5 font-mono text-xs">
       
       {/* Top Main Status Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         
         {/* Left: GNSS Lock & Coordinate Stream */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="relative w-8 h-8 rounded-lg bg-emerald-950/80 text-emerald-400 flex items-center justify-center border border-emerald-700/60 shrink-0">
-            <Radio className={`w-4 h-4 ${isCalibrating ? 'animate-spin text-amber-400' : 'animate-pulse'}`} />
+          <div className="relative w-8 h-8 rounded-lg bg-emerald-50/80 text-emerald-600 flex items-center justify-center border border-emerald-300/60 shrink-0">
+            <Radio className={`w-4 h-4 ${isCalibrating ? 'animate-spin text-amber-600' : 'animate-pulse'}`} />
             <span className="absolute -top-1 -right-1 flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -136,14 +136,14 @@ export const RealtimeGpsIndicator: React.FC<RealtimeGpsIndicatorProps> = ({
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-white tracking-wide">
+              <span className="text-xs font-bold text-slate-900 tracking-wide">
                 GNSS / RTK SATELLITE FIX
               </span>
-              <span className="text-[9px] bg-emerald-950 text-emerald-300 font-bold px-1.5 py-0.2 rounded border border-emerald-800">
+              <span className="text-[9px] bg-emerald-50 text-emerald-700 font-bold px-1.5 py-0.2 rounded border border-emerald-200">
                 LOCKED (±{accuracy}m)
               </span>
             </div>
-            <div className="text-[11px] text-cyan-300 font-bold tracking-tight truncate mt-0.5">
+            <div className="text-[11px] text-cyan-700 font-bold tracking-tight truncate mt-0.5">
               LAT: {currentCoords.lat.toFixed(6)}° N • LNG: {currentCoords.lng.toFixed(6)}° E
             </div>
           </div>
@@ -152,8 +152,8 @@ export const RealtimeGpsIndicator: React.FC<RealtimeGpsIndicatorProps> = ({
         {/* Right: Geofence status & Acquire Button */}
         <div className="flex items-center gap-2 self-end sm:self-center">
           <div className="text-right hidden md:block">
-            <div className="text-[10px] text-slate-400">Target Proximity</div>
-            <div className="text-xs font-bold text-emerald-400">
+            <div className="text-[10px] text-slate-500">Target Proximity</div>
+            <div className="text-xs font-bold text-emerald-600">
               {geofenceDistanceMeters}m to Site (INSIDE GEOFENCE)
             </div>
           </div>
@@ -162,7 +162,7 @@ export const RealtimeGpsIndicator: React.FC<RealtimeGpsIndicatorProps> = ({
             <button
               onClick={onGetPosition}
               disabled={isAcquiring}
-              className="flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-950 hover:bg-cyan-900 border border-cyan-700/60 text-cyan-200 text-xs font-semibold transition disabled:opacity-50"
+              className="flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-50 hover:bg-cyan-100 border border-cyan-300/60 text-cyan-800 text-xs font-semibold transition disabled:opacity-50"
             >
               <LocateFixed className={`w-3.5 h-3.5 ${isAcquiring ? 'animate-spin' : ''}`} />
               <span>{isAcquiring ? 'Locking...' : 'Sync GPS'}</span>
@@ -171,7 +171,7 @@ export const RealtimeGpsIndicator: React.FC<RealtimeGpsIndicatorProps> = ({
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded text-slate-500 hover:text-slate-900 hover:bg-slate-200 transition"
             title="Toggle Telemetry Details"
           >
             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -182,25 +182,25 @@ export const RealtimeGpsIndicator: React.FC<RealtimeGpsIndicatorProps> = ({
 
       {/* Expanded Live Telemetry Drawer */}
       {isExpanded && (
-        <div className="pt-2 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] text-slate-300">
-          <div className="p-2 rounded bg-slate-950 border border-slate-800/80">
+        <div className="pt-2 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] text-slate-700">
+          <div className="p-2 rounded bg-slate-50 border border-slate-200/80">
             <div className="text-slate-500 uppercase">Satellites</div>
-            <div className="font-bold text-cyan-400 text-xs mt-0.5">{satellitesLocked} Fixes (GPS+Galileo)</div>
+            <div className="font-bold text-cyan-600 text-xs mt-0.5">{satellitesLocked} Fixes (GPS+Galileo)</div>
           </div>
 
-          <div className="p-2 rounded bg-slate-950 border border-slate-800/80">
+          <div className="p-2 rounded bg-slate-50 border border-slate-200/80">
             <div className="text-slate-500 uppercase">Altitude</div>
-            <div className="font-bold text-slate-200 text-xs mt-0.5">{altitude} m MSL</div>
+            <div className="font-bold text-slate-800 text-xs mt-0.5">{altitude} m MSL</div>
           </div>
 
-          <div className="p-2 rounded bg-slate-950 border border-slate-800/80">
+          <div className="p-2 rounded bg-slate-50 border border-slate-200/80">
             <div className="text-slate-500 uppercase">Heading</div>
-            <div className="font-bold text-slate-200 text-xs mt-0.5">{heading}° Azimuth</div>
+            <div className="font-bold text-slate-800 text-xs mt-0.5">{heading}° Azimuth</div>
           </div>
 
-          <div className="p-2 rounded bg-slate-950 border border-slate-800/80">
+          <div className="p-2 rounded bg-slate-50 border border-slate-200/80">
             <div className="text-slate-500 uppercase">Last Packet</div>
-            <div className="font-bold text-emerald-400 text-xs mt-0.5">{lastSyncTime || 'LIVE'}</div>
+            <div className="font-bold text-emerald-600 text-xs mt-0.5">{lastSyncTime || 'LIVE'}</div>
           </div>
         </div>
       )}

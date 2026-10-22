@@ -281,30 +281,30 @@ export const FieldOfficerApp: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 font-sans text-slate-100 select-none">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-4 font-sans text-slate-900 select-none">
       
       {/* Mobile Terminal Top Banner */}
-      <div className="bg-[#090e1d] rounded-lg p-3.5 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+      <div className="bg-card rounded-xl p-4 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-700/60 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-300/60 flex items-center justify-center shrink-0">
             <Smartphone className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-bold text-white font-mono">FIELD OPERATIONS TERMINAL</span>
-              <span className="bg-emerald-950 text-emerald-300 text-[10px] font-bold px-2 py-0.2 rounded font-mono border border-emerald-800 whitespace-nowrap">
+              <span className="text-base font-extrabold text-slate-900 tracking-tight">Field Operations Terminal</span>
+              <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.2 rounded font-mono border border-emerald-200 whitespace-nowrap">
                 GPS LOCK ACTIVE
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Officer {currentUser.name} • {currentUser.team}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <span className="bg-slate-900 border border-slate-800 text-slate-300 px-2.5 py-1 rounded flex items-center gap-1.5 font-mono text-[11px]">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="bg-slate-100 border border-slate-200 text-slate-700 px-2.5 py-1 rounded flex items-center gap-1.5 font-mono text-[11px]">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             <span>EXIF Geo-Verification</span>
           </span>
         </div>
@@ -321,12 +321,12 @@ export const FieldOfficerApp: React.FC = () => {
 
       {/* GPS Notification Toast Banner */}
       {gpsNotification && (
-        <div className="bg-emerald-950/90 border border-emerald-700 text-emerald-200 text-xs px-3.5 py-2 rounded-lg shadow-md flex items-center justify-between font-mono animate-in fade-in duration-150">
+        <div className="bg-emerald-50/90 border border-emerald-300 text-emerald-800 text-xs px-3.5 py-2 rounded-lg shadow-md flex items-center justify-between font-mono animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <LocateFixed className="w-4 h-4 text-emerald-400 shrink-0" />
+            <LocateFixed className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{gpsNotification}</span>
           </div>
-          <span className="text-[10px] bg-emerald-900 text-emerald-100 font-bold px-1.5 py-0.2 rounded">
+          <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-1.5 py-0.2 rounded">
             ANCHOR SYNCED
           </span>
         </div>
@@ -334,10 +334,10 @@ export const FieldOfficerApp: React.FC = () => {
 
       {/* VIEW 1: MY ASSIGNED TASKS */}
       {(activeView === 'MY_TASKS' || activeView === 'FIELD_OFFICER_PORTAL') && (
-        <div className="space-y-3 font-mono text-xs">
-          <div className="flex items-center justify-between pb-1 border-b border-slate-800">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <ClipboardList className="w-4 h-4 text-cyan-400" />
+        <div className="space-y-3 font-sans text-xs">
+          <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <ClipboardList className="w-4 h-4 text-cyan-600" />
               <span>Assigned Remediation Tasks ({tasks.length})</span>
             </h3>
             <span className="text-[10px] text-slate-500">Rapid Response Unit</span>
@@ -351,69 +351,69 @@ export const FieldOfficerApp: React.FC = () => {
               return (
                 <div 
                   key={task.task_id}
-                  className={`bg-[#090e1d] rounded-lg p-3.5 border transition shadow-sm ${
+                  className={`bg-card rounded-xl p-4 border transition shadow-sm ${
                     isSelected 
                       ? 'border-cyan-500/80 ring-1 ring-cyan-500/30' 
-                      : 'border-slate-800 hover:border-slate-700'
+                      : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-extrabold text-white text-sm">{task.task_id}</span>
-                        <span className="bg-slate-900 text-slate-300 font-bold px-2 py-0.5 rounded text-xs border border-slate-800">
+                        <span className="font-mono font-extrabold text-slate-900 text-sm">{task.task_id}</span>
+                        <span className="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded text-xs border border-slate-200">
                           {task.hotspot_id}
                         </span>
                         {isHero && (
-                          <span className="bg-amber-400 text-slate-950 font-black text-[10px] px-1.5 py-0.2 rounded">
+                          <span className="bg-amber-400 text-[#1a1300] font-black text-[10px] px-1.5 py-0.2 rounded">
                             HERO SITE
                           </span>
                         )}
                         <span className={`text-[10px] font-extrabold px-1.5 py-0.2 rounded uppercase ${
                           task.priority === 'Critical' 
-                            ? 'bg-red-950 text-red-300 border border-red-800' 
+                            ? 'bg-red-50 text-red-700 border border-red-200' 
                             : task.priority === 'High' 
-                              ? 'bg-orange-950 text-orange-300 border border-orange-800' 
-                              : 'bg-amber-950 text-amber-300 border border-amber-800'
+                              ? 'bg-orange-50 text-orange-700 border border-orange-200' 
+                              : 'bg-amber-50 text-amber-700 border border-amber-200'
                         }`}>
                           {task.priority} Priority
                         </span>
                       </div>
 
-                      <div className="text-xs font-semibold text-slate-200 mt-1 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                      <div className="text-xs font-semibold text-slate-800 mt-1 flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-cyan-600 shrink-0" />
                         <span>{task.location}</span>
-                        <span className="text-slate-600">•</span>
-                        <span className="text-slate-400 font-normal">{task.ward}</span>
+                        <span className="text-slate-400">•</span>
+                        <span className="text-slate-500 font-normal">{task.ward}</span>
                       </div>
                     </div>
 
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
                       task.status === 'ASSIGNED' 
-                        ? 'bg-amber-950 text-amber-300 border border-amber-800' 
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200' 
                         : task.status === 'IN_PROGRESS' 
-                          ? 'bg-cyan-950 text-cyan-300 border border-cyan-800' 
+                          ? 'bg-cyan-50 text-cyan-700 border border-cyan-200' 
                           : task.status === 'AWAITING_VERIFICATION' 
-                            ? 'bg-purple-950 text-purple-300 border border-purple-800' 
-                            : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                            ? 'bg-purple-50 text-purple-700 border border-purple-200' 
+                            : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     }`}>
                       {task.status.replace('_', ' ')}
                     </span>
                   </div>
 
-                  <div className="mt-2.5 p-2.5 bg-slate-950 rounded-md text-xs space-y-1 border border-slate-800/80 font-sans">
-                    <div className="font-semibold text-slate-200 flex items-center gap-1.5 font-mono text-[11px]">
-                      <Sparkles className="w-3 h-3 text-cyan-400" />
+                  <div className="mt-2.5 p-2.5 bg-slate-50 rounded-md text-xs space-y-1 border border-slate-200/80 font-sans">
+                    <div className="font-semibold text-slate-800 flex items-center gap-1.5 text-xs">
+                      <Sparkles className="w-3 h-3 text-cyan-600" />
                       <span>Action: {task.recommended_action}</span>
                     </div>
-                    <div className="text-slate-400 text-[10px] flex items-center justify-between font-mono pt-0.5">
+                    <div className="text-slate-500 text-[10px] flex items-center justify-between pt-0.5 tabular-nums">
                       <span>Assigned by: {task.assigned_by}</span>
-                      <span className="text-slate-300">Deadline: {task.deadline}</span>
+                      <span className="text-slate-700">Deadline: {task.deadline}</span>
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
-                    <div className="text-[10px] text-slate-400 font-mono">
+                  <div className="mt-3 pt-2.5 border-t border-slate-200/80 flex items-center justify-between flex-wrap gap-2">
+                    <div className="text-[10px] text-slate-500">
                       Officer: <strong>{task.assigned_officer}</strong>
                     </div>
 
@@ -424,7 +424,7 @@ export const FieldOfficerApp: React.FC = () => {
                           setActiveTaskId(task.task_id);
                           handleStartInspection();
                         }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-xs font-bold text-white shadow-xs transition font-mono uppercase"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-cyan-600 hover:bg-cyan-500 text-xs font-bold text-white shadow-xs transition tracking-wide"
                       >
                         <Navigation className="w-3.5 h-3.5" />
                         <span>START INSPECTION (STEP 10)</span>
@@ -437,7 +437,7 @@ export const FieldOfficerApp: React.FC = () => {
                           setActiveTaskId(task.task_id);
                           setActiveView('ACTIVE_INSPECTION');
                         }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-xs font-bold text-white shadow-xs transition font-mono uppercase"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-xs font-bold text-white shadow-xs transition tracking-wide"
                       >
                         <Camera className="w-3.5 h-3.5" />
                         <span>CONTINUE EVIDENCE (STEP 11)</span>
@@ -455,31 +455,31 @@ export const FieldOfficerApp: React.FC = () => {
       {activeView === 'ACTIVE_INSPECTION' && selectedTask && (
         <div className="space-y-4">
           
-          <div className="flex items-center justify-between pb-1 border-b border-slate-800">
+          <div className="flex items-center justify-between pb-1 border-b border-slate-200">
             <button
               onClick={() => setActiveView('MY_TASKS')}
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white font-mono transition"
+              className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 font-semibold transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Assigned Tasks</span>
             </button>
-            <span className="text-xs font-mono text-cyan-400 font-bold">
+            <span className="text-xs font-mono text-cyan-600 font-bold">
               Task: {selectedTask.task_id} ({selectedTask.hotspot_id})
             </span>
           </div>
 
           {/* Site Geo Target Header */}
-          <div className="bg-[#090e1d] rounded-lg p-3.5 border border-slate-800 space-y-2">
+          <div className="bg-card rounded-xl p-4 border border-slate-200 space-y-2">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-black text-white font-mono">
+                <h2 className="text-base font-black text-slate-900 tracking-tight">
                   {selectedTask.hotspot_id}: {taskLocationName}
                 </h2>
-                <p className="text-xs text-slate-400 font-mono mt-0.5">
+                <p className="text-xs text-slate-500 font-mono mt-0.5">
                   Target Coords: {siteLat.toFixed(5)}° N, {siteLng.toFixed(5)}° E • {selectedTask.ward}
                 </p>
               </div>
-              <span className="bg-red-950 text-red-300 font-mono text-xs font-bold px-2 py-0.5 rounded border border-red-800">
+              <span className="bg-red-50 text-red-700 font-mono text-xs font-bold px-2 py-0.5 rounded border border-red-200">
                 CRITICAL TARGET
               </span>
             </div>
@@ -489,21 +489,21 @@ export const FieldOfficerApp: React.FC = () => {
           <form onSubmit={handleSubmitForVerification} className="space-y-4">
             
             {/* Step A: Before Intervention Evidence */}
-            <div className="bg-[#090e1d] rounded-lg p-3.5 border border-slate-800 space-y-3 font-mono text-xs">
+            <div className="bg-card rounded-xl p-4 border border-slate-200 space-y-3 font-sans text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-red-950 text-red-300 border border-red-800 flex items-center justify-center font-bold text-[10px]">
+                  <span className="w-5 h-5 rounded bg-red-50 text-red-700 border border-red-200 flex items-center justify-center font-bold text-[10px]">
                     1
                   </span>
-                  <span className="font-bold text-white text-xs uppercase">
+                  <span className="font-bold text-slate-900 text-xs uppercase">
                     BEFORE INTERVENTION (EVIDENCE CAPTURE)
                   </span>
                 </div>
-                <span className="text-[10px] text-emerald-400 font-bold">WATERMARK APPLIED</span>
+                <span className="text-[10px] text-emerald-600 font-bold">WATERMARK APPLIED</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="relative aspect-video rounded-lg overflow-hidden border border-slate-800 bg-slate-950">
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
                   <img src={beforeImage} alt="Before Intervention" className="w-full h-full object-cover" />
                 </div>
                 <div className="space-y-2 flex flex-col justify-between">
@@ -514,8 +514,8 @@ export const FieldOfficerApp: React.FC = () => {
                     taskLocationName={taskLocationName}
                   />
                   <div className="flex gap-2">
-                    <label className="flex-1 py-1.5 px-3 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition">
-                      <Camera className="w-3.5 h-3.5 text-cyan-400" />
+                    <label className="flex-1 py-1.5 px-3 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition">
+                      <Camera className="w-3.5 h-3.5 text-cyan-600" />
                       <span>Retake / Upload Photo</span>
                       <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'before')} className="hidden" />
                     </label>
@@ -525,12 +525,12 @@ export const FieldOfficerApp: React.FC = () => {
             </div>
 
             {/* Step B: Preventive Remediation Checklist */}
-            <div className="bg-[#090e1d] rounded-lg p-3.5 border border-slate-800 space-y-2.5 font-mono text-xs">
+            <div className="bg-card rounded-xl p-4 border border-slate-200 space-y-2.5 font-sans text-xs">
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center justify-center font-bold text-[10px]">
+                <span className="w-5 h-5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 flex items-center justify-center font-bold text-[10px]">
                   2
                 </span>
-                <span className="font-bold text-white text-xs uppercase">
+                <span className="font-bold text-slate-900 text-xs uppercase">
                   REMEDIATION ACTIONS EXECUTED
                 </span>
               </div>
@@ -543,43 +543,43 @@ export const FieldOfficerApp: React.FC = () => {
                     onClick={() => toggleChecklistItem(key as keyof typeof checklist)}
                     className={`p-2 rounded border text-left flex items-center gap-2 transition ${
                       value 
-                        ? 'bg-emerald-950/40 border-emerald-700/60 text-emerald-200' 
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                        ? 'bg-emerald-50/40 border-emerald-300/60 text-emerald-800' 
+                        : 'bg-slate-50 border-slate-200 text-slate-500'
                     }`}
                   >
-                    {value ? <CheckSquare className="w-4 h-4 text-emerald-400 shrink-0" /> : <Square className="w-4 h-4 text-slate-600 shrink-0" />}
+                    {value ? <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" /> : <Square className="w-4 h-4 text-slate-400 shrink-0" />}
                     <span className="text-[11px] font-sans capitalize">{key.replace(/_/g, ' ')}</span>
                   </button>
                 ))}
               </div>
 
               <div className="pt-2">
-                <label className="block text-[10px] text-slate-400 uppercase mb-1">Field Officer Inspection Log Notes</label>
+                <label className="block text-[10px] text-slate-500 uppercase mb-1">Field Officer Inspection Log Notes</label>
                 <textarea
                   value={officerNotes}
                   onChange={(e) => setOfficerNotes(e.target.value)}
                   rows={2}
-                  className="w-full p-2 rounded bg-slate-950 border border-slate-800 text-xs text-slate-200 font-sans focus:outline-none focus:border-cyan-500"
+                  className="w-full p-2 rounded bg-slate-50 border border-slate-200 text-xs text-slate-800 font-sans focus:outline-none focus:border-cyan-500"
                 />
               </div>
             </div>
 
             {/* Step C: After Intervention Evidence */}
-            <div className="bg-[#090e1d] rounded-lg p-3.5 border border-slate-800 space-y-3 font-mono text-xs">
+            <div className="bg-card rounded-xl p-4 border border-slate-200 space-y-3 font-sans text-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center justify-center font-bold text-[10px]">
+                  <span className="w-5 h-5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-[10px]">
                     3
                   </span>
-                  <span className="font-bold text-white text-xs uppercase">
+                  <span className="font-bold text-slate-900 text-xs uppercase">
                     AFTER INTERVENTION (POST-REMEDIATION PROOF)
                   </span>
                 </div>
-                <span className="text-[10px] text-emerald-400 font-bold">WATERMARK APPLIED</span>
+                <span className="text-[10px] text-emerald-600 font-bold">WATERMARK APPLIED</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="relative aspect-video rounded-lg overflow-hidden border border-slate-800 bg-slate-950">
+                <div className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
                   <img src={afterImage} alt="After Intervention" className="w-full h-full object-cover" />
                 </div>
                 <div className="space-y-2 flex flex-col justify-between">
@@ -590,8 +590,8 @@ export const FieldOfficerApp: React.FC = () => {
                     taskLocationName={taskLocationName}
                   />
                   <div className="flex gap-2">
-                    <label className="flex-1 py-1.5 px-3 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition">
-                      <Camera className="w-3.5 h-3.5 text-cyan-400" />
+                    <label className="flex-1 py-1.5 px-3 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition">
+                      <Camera className="w-3.5 h-3.5 text-cyan-600" />
                       <span>Retake / Upload Photo</span>
                       <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'after')} className="hidden" />
                     </label>
@@ -619,19 +619,19 @@ export const FieldOfficerApp: React.FC = () => {
 
       {/* VIEW 3: INTERVENTION HISTORY */}
       {activeView === 'HISTORY' && (
-        <div className="space-y-3 font-mono text-xs">
-          <div className="pb-1 border-b border-slate-800">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+        <div className="space-y-3 font-sans text-xs">
+          <div className="pb-1 border-b border-slate-200">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
               Field Intervention History
             </h3>
           </div>
 
-          <div className="bg-[#090e1d] rounded-lg p-3.5 border border-slate-800 space-y-2">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px]">
-              <span className="font-bold text-white">TSK-6591 (VG-1042)</span>
-              <span className="text-emerald-400 font-bold">VERIFIED & APPROVED</span>
+          <div className="bg-card rounded-xl p-4 border border-slate-200 space-y-2">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-200 text-[11px]">
+              <span className="font-bold text-slate-900">TSK-6591 (VG-1042)</span>
+              <span className="text-emerald-600 font-bold">VERIFIED & APPROVED</span>
             </div>
-            <p className="text-slate-400 font-sans text-xs">
+            <p className="text-slate-500 font-sans text-xs">
               Remediated stagnant water retention pit. Bti larvicide barrier applied. Cleared by Dr. Neha Sharma.
             </p>
           </div>

@@ -22,6 +22,7 @@ import {
   CheckSquare
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { RiskScoreTile } from '../common/RiskBadge';
 
 export const AdminDashboard: React.FC = () => {
   const { 
@@ -37,6 +38,8 @@ export const AdminDashboard: React.FC = () => {
   const pendingVerificationCount = tasks.filter(t => t.status === 'AWAITING_VERIFICATION').length;
   const resolvedCount = hotspots.filter(h => h.status === 'RESOLVED').length;
   const activeTasksCount = tasks.filter(t => t.status === 'ASSIGNED' || t.status === 'IN_PROGRESS').length;
+  const cityCount = new Set(hotspots.map(h => h.city)).size;
+  const stateCount = new Set(hotspots.map(h => h.state)).size;
 
   // Top 5 priority hotspots ranked by predictive breeding risk score
   const topPriorityHotspots = [...hotspots]
@@ -73,7 +76,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* 2. CORE OPERATIONAL LIFECYCLE (Compact 4 Equal Cards) */}
-      <div className="bg-white rounded-xl border border-slate-200 p-3.5 sm:p-4 shadow-xs">
+      <div className="bg-card rounded-xl border border-slate-200 p-3.5 sm:p-4 shadow-xs">
         <div className="flex items-center justify-between text-xs pb-2.5 border-b border-slate-100">
           <span className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
             Core Operational Lifecycle
@@ -99,7 +102,7 @@ export const AdminDashboard: React.FC = () => {
               <span className="font-mono text-slate-400 text-[11px] group-hover:text-blue-600 transition">Map →</span>
             </div>
             <div>
-              <div className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">30 Hotspots</div>
+              <div className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">{hotspots.length} Hotspots</div>
               <p className="text-[11px] text-slate-500 truncate mt-0.5">Risk prioritization</p>
             </div>
           </button>
@@ -170,15 +173,15 @@ export const AdminDashboard: React.FC = () => {
         {/* Critical Risk */}
         <div 
           onClick={() => setActiveView('RISK_MAP')}
-          className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
+          className="bg-card rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
         >
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>Critical Risk</span>
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-600" />
+            <span className="w-2.5 h-2.5 rounded-full bg-risk-critical" />
           </div>
           <div>
             <div className="text-2xl font-extrabold text-slate-900 tracking-tight">{criticalHotspots.length}</div>
-            <div className="text-[11px] text-purple-700 font-semibold mt-0.5">
+            <div className="text-[11px] text-slate-500 font-semibold mt-0.5">
               Score 81–100 • Immediate
             </div>
           </div>
@@ -187,15 +190,15 @@ export const AdminDashboard: React.FC = () => {
         {/* High Risk */}
         <div 
           onClick={() => setActiveView('RISK_MAP')}
-          className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
+          className="bg-card rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
         >
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>High Risk</span>
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-risk-high" />
           </div>
           <div>
             <div className="text-2xl font-extrabold text-slate-900 tracking-tight">{highHotspots.length}</div>
-            <div className="text-[11px] text-rose-700 font-semibold mt-0.5">
+            <div className="text-[11px] text-slate-500 font-semibold mt-0.5">
               Score 61–80 • Priority
             </div>
           </div>
@@ -204,7 +207,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Active Tasks */}
         <div 
           onClick={() => setActiveView('TASKS')}
-          className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
+          className="bg-card rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
         >
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>Active Tasks</span>
@@ -221,7 +224,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Pending Verification */}
         <div 
           onClick={() => setActiveView('VERIFICATION')}
-          className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
+          className="bg-card rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
         >
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>Pending Verification</span>
@@ -238,7 +241,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Resolved Sites */}
         <div 
           onClick={() => setActiveView('VERIFICATION')}
-          className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
+          className="bg-card rounded-xl border border-slate-200 p-3.5 shadow-xs cursor-pointer hover:border-slate-300 transition flex flex-col justify-between h-[105px]"
         >
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>Resolved Sites</span>
@@ -258,7 +261,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 items-start">
         
         {/* Left Column (68% - 8 cols): Priority Action Queue */}
-        <div className="lg:col-span-8 bg-white rounded-xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-3">
+        <div className="lg:col-span-8 bg-card rounded-xl border border-slate-200 shadow-xs p-4 sm:p-5 space-y-3">
           <div className="flex items-center justify-between pb-2.5 border-b border-slate-100">
             <div>
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -275,7 +278,7 @@ export const AdminDashboard: React.FC = () => {
               onClick={() => setActiveView('HOTSPOTS')}
               className="text-xs text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 transition"
             >
-              <span>View All 30</span>
+              <span>View All {hotspots.length}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -292,11 +295,7 @@ export const AdminDashboard: React.FC = () => {
                   }`}
                 >
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className={`w-9 h-9 rounded-lg flex flex-col items-center justify-center font-bold text-xs text-white shrink-0 ${
-                      hotspot.risk_level === 'CRITICAL' ? 'bg-purple-600' : 'bg-rose-500'
-                    }`}>
-                      <span>{hotspot.breeding_risk_score}</span>
-                    </div>
+                    <RiskScoreTile level={hotspot.risk_level} score={hotspot.breeding_risk_score} />
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -306,7 +305,7 @@ export const AdminDashboard: React.FC = () => {
                             DEMO TARGET
                           </span>
                         )}
-                        <span className="text-[11px] font-medium text-slate-600 bg-white border border-slate-200 px-1.5 py-0.2 rounded">
+                        <span className="text-[11px] font-medium text-slate-600 bg-card border border-slate-200 px-1.5 py-0.2 rounded">
                           {hotspot.city}, {hotspot.state}
                         </span>
                         <span className="text-[11px] text-slate-500 truncate">
@@ -341,7 +340,7 @@ export const AdminDashboard: React.FC = () => {
                     <button
                       id={`inspect-btn-${hotspot.hotspot_id}`}
                       onClick={() => setSelectedHotspotId(hotspot.hotspot_id)}
-                      className="px-2.5 py-1 rounded-md text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 transition"
+                      className="px-2.5 py-1 rounded-md text-xs font-semibold bg-card hover:bg-slate-100 text-slate-700 border border-slate-300 transition"
                     >
                       Inspect
                     </button>
@@ -366,7 +365,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="lg:col-span-4 space-y-4">
           
           {/* Pilot Telemetry Card */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
+          <div className="bg-card rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-blue-600" />
@@ -384,11 +383,11 @@ export const AdminDashboard: React.FC = () => {
               </div>
               <div className="flex items-center justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500 font-medium">Surveillance Sites</span>
-                <span className="font-bold text-slate-800 font-mono">30 Seed Sites</span>
+                <span className="font-bold text-slate-800 font-mono">{hotspots.length} Sites</span>
               </div>
               <div className="flex items-center justify-between py-1 border-b border-slate-100">
                 <span className="text-slate-500 font-medium">Geographic Coverage</span>
-                <span className="font-bold text-slate-800">21 Cities • 15 States</span>
+                <span className="font-bold text-slate-800">{cityCount} Cities • {stateCount} States</span>
               </div>
             </div>
 
@@ -426,7 +425,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Operational Surveillance Feed Card */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5">
+          <div className="bg-card rounded-xl border border-slate-200 p-4 shadow-xs space-y-2.5">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 pb-1.5 border-b border-slate-100">
               <Activity className="w-3.5 h-3.5 text-emerald-600" />
               <span>Surveillance Feed</span>
@@ -464,7 +463,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* 5. PROACTIVE VS REACTIVE RESOURCE EFFICIENCY STRIP */}
-      <div className="bg-slate-900 text-white rounded-xl p-4 border border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <div className="vg-panel-dark rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         <div className="space-y-0.5">
           <div className="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" />

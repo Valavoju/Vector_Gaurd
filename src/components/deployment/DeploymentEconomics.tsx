@@ -19,7 +19,7 @@ export const DeploymentEconomics: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-[1560px] mx-auto space-y-5">
       
       {/* Header Banner */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="vg-hero rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center ring-1 ring-emerald-500/30">
             <Coins className="w-6 h-6" />
@@ -58,7 +58,7 @@ export const DeploymentEconomics: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Tier 1: Prototype */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Phase 1: Proof-of-Concept</div>
             <h3 className="text-xl font-extrabold text-slate-900">Prototype Build</h3>
@@ -91,7 +91,7 @@ export const DeploymentEconomics: React.FC = () => {
         </div>
 
         {/* Tier 2: 1-Ward Pilot */}
-        <div className="bg-white rounded-2xl border-2 border-indigo-500 p-6 shadow-md flex flex-col justify-between space-y-4 relative">
+        <div className="bg-card rounded-2xl border-2 border-indigo-500 p-6 shadow-md flex flex-col justify-between space-y-4 relative">
           <span className="absolute -top-3 right-6 bg-indigo-600 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
             Recommended Next Step
           </span>
@@ -132,7 +132,7 @@ export const DeploymentEconomics: React.FC = () => {
         </div>
 
         {/* Tier 3: City-Scale */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
+        <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Phase 3: Municipal Scale</div>
             <h3 className="text-xl font-extrabold text-slate-900">City-Scale Deployment</h3>
@@ -171,7 +171,7 @@ export const DeploymentEconomics: React.FC = () => {
       </div>
 
       {/* COST COMPONENT BREAKDOWN TABLE */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+      <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
         <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
           Annual Cost Component Breakdown (City-Scale Pilot)
         </h3>
@@ -223,7 +223,7 @@ export const DeploymentEconomics: React.FC = () => {
       </div>
 
       {/* PHASED ROLLOUT ROADMAP */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
+      <div className="vg-panel-dark rounded-2xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
           Phased Municipal Implementation Strategy
         </h3>

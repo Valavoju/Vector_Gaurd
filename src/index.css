@@ -1,9 +1,346 @@
 @import "tailwindcss";
+@import "./styles/palette.css";
 
-html, body {
+/* Class-based dark mode: <html class="dark"> is toggled by ThemeContext. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-display: "Exo 2", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Glass surfaces. bg-card is the default panel, bg-surface is for popovers/modals. */
+  --color-card: rgb(255 255 255 / 0.66);
+  --color-surface: rgb(250 252 255 / 0.98);
+
+  /* Brand scale sampled from the Vector Guard mark (royal blue -> azure -> cyan). */
+  --color-brand-50: #eef5ff;
+  --color-brand-100: #dbe9ff;
+  --color-brand-200: #bcd6ff;
+  --color-brand-300: #8dbaff;
+  --color-brand-400: #4f93ff;
+  --color-brand-500: #1f6fff;
+  --color-brand-600: #1452f0;
+  --color-brand-700: #0f3fd0;
+  --color-brand-800: #1236a6;
+  --color-brand-900: #142f80;
+  --color-brand-950: #0a1a4a;
+  --color-cyan-glow: #22d3ee;
+  --color-navy: #050b1f;
+
+  /* Risk severity: the dataviz skill's fixed status steps (critical / serious /
+     warning / good). Mode-invariant by design; always paired with a text label. */
+  --color-risk-critical: #d03b3b;
+  --color-risk-high: #ec835a;
+  --color-risk-moderate: #fab219;
+  --color-risk-low: #0ca30c;
+
+  --animate-page-in: vg-page-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pop-in: vg-pop-in 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-shimmer: vg-shimmer 1.6s linear infinite;
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme tokens                                                         */
+/* ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  /* Light neutrals are slightly translucent so glass panels pick up the backdrop. */
+  --color-slate-50: rgb(241 246 252 / 0.78);
+  --color-slate-100: rgb(229 238 249 / 0.85);
+  --color-slate-200: rgb(212 224 240 / 0.95);
+
+  --vg-bg: #e7f0fa;
+  --vg-blob-1: rgb(56 189 248 / 0.28);
+  --vg-blob-2: rgb(37 99 235 / 0.16);
+  --vg-blob-3: rgb(34 211 238 / 0.18);
+  --vg-glass-border: rgb(255 255 255 / 0.75);
+  --vg-glass-shadow: 0 10px 40px -12px rgb(30 64 175 / 0.16);
+  --vg-scrollbar: rgb(100 116 139 / 0.35);
+  --vg-brand-gradient: linear-gradient(135deg, #0b2bd8 0%, #1463ff 48%, #22c8f5 100%);
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Neutral charcoal surfaces; brand blue is reserved for accents. */
+  --color-card: rgb(27 28 32 / 0.74);
+  --color-surface: rgb(23 24 28 / 0.985);
+
+  /* Mirrored neutral scale: low steps are white washes/hairlines, high steps are ink. */
+  --color-slate-50: rgb(255 255 255 / 0.035);
+  --color-slate-100: rgb(255 255 255 / 0.06);
+  --color-slate-200: rgb(255 255 255 / 0.09);
+  --color-slate-300: rgb(255 255 255 / 0.16);
+  --color-slate-400: #85858c;
+  --color-slate-500: #9d9da4;
+  --color-slate-600: #b4b4ba;
+  --color-slate-700: #c9c9ce;
+  --color-slate-800: #dddde1;
+  --color-slate-900: #efeff1;
+  --color-slate-950: #fafafa;
+
+  --color-brand-50: rgb(31 111 255 / 0.12);
+  --color-brand-100: rgb(31 111 255 / 0.2);
+  --color-brand-200: rgb(79 147 255 / 0.32);
+  --color-brand-700: #8dbaff;
+  --color-brand-800: #bcd6ff;
+  --color-brand-900: #dbe9ff;
+
+  --vg-bg: #0e0f12;
+  --vg-blob-1: rgb(31 111 255 / 0.07);
+  --vg-blob-2: rgb(34 211 238 / 0.035);
+  --vg-blob-3: rgb(31 111 255 / 0.045);
+  --vg-glass-border: rgb(255 255 255 / 0.08);
+  --vg-glass-shadow: 0 16px 40px -18px rgb(0 0 0 / 0.7);
+  --vg-scrollbar: rgb(255 255 255 / 0.16);
+}
+
+/* Panels that stay dark in both themes. Palette restore lives in palette.css. */
+.vg-island,
+.vg-hero,
+.vg-panel-dark {
+  color-scheme: dark;
+  --color-card: rgb(255 255 255 / 0.05);
+  --color-surface: #0c1530;
+  --color-brand-50: #eef5ff;
+  --color-brand-100: #dbe9ff;
+  --color-brand-200: #bcd6ff;
+  --color-brand-700: #0f3fd0;
+  --color-brand-800: #1236a6;
+  --color-brand-900: #142f80;
+}
+
+/* In dark mode the always-dark panels drop their slate (blue-grey) cast too. */
+.dark :is(.vg-island, .vg-hero, .vg-panel-dark) {
+  --color-card: rgb(255 255 255 / 0.04);
+  --color-surface: #17181c;
+  --color-slate-600: #52525b;
+  --color-slate-700: #3f3f46;
+  --color-slate-800: #27272a;
+  --color-slate-900: #18181b;
+  --color-slate-950: #0e0f12;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                 */
+/* ------------------------------------------------------------------ */
+
+html,
+body {
   overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-slate-800);
+  background-color: var(--vg-bg);
+  background-image:
+    radial-gradient(60rem 40rem at -10% -10%, var(--vg-blob-1), transparent 60%),
+    radial-gradient(50rem 36rem at 110% 10%, var(--vg-blob-2), transparent 60%),
+    radial-gradient(56rem 40rem at 60% 120%, var(--vg-blob-3), transparent 60%);
+  background-attachment: fixed;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--vg-scrollbar) transparent;
+}
+
+::selection {
+  background: #1f6fff;
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid #1f6fff;
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Glass system                                                         */
+/* ------------------------------------------------------------------ */
+
+@layer components {
+  /* Card-sized panels get frosted. Skipped while they contain a fixed overlay,
+     because backdrop-filter would become that overlay's containing block. */
+  .bg-card:is(.rounded-xl, .rounded-2xl, .rounded-3xl):not(:has(.fixed)),
+  .vg-glass {
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+  }
+
+  .bg-card.rounded-2xl,
+  .bg-card.rounded-3xl {
+    border-color: var(--vg-glass-border);
+    box-shadow: var(--vg-glass-shadow);
+  }
+
+  .vg-glass {
+    background-color: var(--color-card);
+    border: 1px solid var(--vg-glass-border);
+    box-shadow: var(--vg-glass-shadow);
+  }
+
+  .bg-surface {
+    -webkit-backdrop-filter: blur(24px) saturate(1.6);
+    backdrop-filter: blur(24px) saturate(1.6);
+  }
+
+  .vg-brand-gradient {
+    background-image: var(--vg-brand-gradient);
+  }
+
+  .vg-brand-text {
+    background-image: linear-gradient(100deg, #1452f0 0%, #1f8bff 50%, #22c8f5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .vg-btn-primary {
+    background-image: var(--vg-brand-gradient);
+    color: #fff;
+    box-shadow: 0 8px 24px -10px rgb(20 82 240 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.25);
+    transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .vg-btn-primary:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 10px 28px -10px rgb(20 82 240 / 0.85), inset 0 1px 0 rgb(255 255 255 / 0.25);
+  }
+  .vg-btn-primary:active {
+    transform: translateY(1px);
+  }
+
+  /* Page heroes: the navy + flowing light banner from the brand sheet. */
+  .vg-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: #fff;
+    border: 1px solid rgb(90 140 255 / 0.28) !important;
+    background:
+      radial-gradient(40rem 18rem at 85% -30%, rgb(34 211 238 / 0.28), transparent 60%),
+      radial-gradient(30rem 16rem at 0% 120%, rgb(31 111 255 / 0.35), transparent 60%),
+      linear-gradient(120deg, #050b1f 0%, #081540 55%, #0b2470 100%) !important;
+    box-shadow: 0 24px 60px -28px rgb(10 40 160 / 0.6) !important;
+  }
+  .vg-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.55;
+    pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 240' preserveAspectRatio='none'%3E%3Cg fill='none' stroke-width='1.2'%3E%3Cpath d='M0 170C220 110 380 230 620 170S1000 70 1200 120' stroke='%2322d3ee' stroke-opacity='.55'/%3E%3Cpath d='M0 185C240 120 400 240 640 182S1010 86 1200 138' stroke='%231f8bff' stroke-opacity='.5'/%3E%3Cpath d='M0 200C260 140 420 250 660 196S1020 104 1200 156' stroke='%231463ff' stroke-opacity='.45'/%3E%3Cpath d='M0 214C280 160 440 258 680 210S1030 122 1200 174' stroke='%2322d3ee' stroke-opacity='.3'/%3E%3Cpath d='M0 120C300 200 520 60 760 130S1080 200 1200 90' stroke='%2338bdf8' stroke-opacity='.18'/%3E%3C/g%3E%3C/svg%3E") center bottom / 100% 100% no-repeat;
+  }
+
+  .dark .vg-hero {
+    border-color: rgb(255 255 255 / 0.08) !important;
+    background:
+      radial-gradient(36rem 16rem at 88% -40%, rgb(34 211 238 / 0.1), transparent 60%),
+      radial-gradient(28rem 14rem at 0% 130%, rgb(31 111 255 / 0.16), transparent 60%),
+      linear-gradient(120deg, #141519 0%, #18191d 100%) !important;
+    box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.8) !important;
+  }
+  .dark .vg-hero::before {
+    opacity: 0.32;
+  }
+
+  /* Dark data panels inside light pages (consoles, code-like readouts). */
+  .vg-panel-dark {
+    color: #e2e8f0;
+    border: 1px solid rgb(90 140 255 / 0.22) !important;
+    background:
+      radial-gradient(30rem 14rem at 100% 0%, rgb(31 111 255 / 0.18), transparent 60%),
+      linear-gradient(160deg, #071030 0%, #0a1638 100%) !important;
+  }
+
+  .dark .vg-panel-dark {
+    border-color: rgb(255 255 255 / 0.08) !important;
+    background:
+      radial-gradient(30rem 14rem at 100% 0%, rgb(31 111 255 / 0.08), transparent 60%),
+      linear-gradient(160deg, #131417 0%, #17181b 100%) !important;
+  }
+
+  /* Modal scrim, identical in both themes. */
+  .vg-scrim {
+    background-color: rgb(6 8 14 / 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .vg-skeleton {
+    background: linear-gradient(90deg, var(--color-slate-100) 0%, var(--color-slate-50) 50%, var(--color-slate-100) 100%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion                                                               */
+/* ------------------------------------------------------------------ */
+
+@keyframes vg-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vg-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vg-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes vg-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes vg-wave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes vg-rise {
+  0% {
+    transform: translateY(70%);
+  }
+  100% {
+    transform: translateY(8%);
+  }
 }
 
 @keyframes radar-sweep {
@@ -24,6 +361,73 @@ html, body {
 .animate-radar {
   animation: radar-sweep 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
 }
+
+/* The codebase uses tailwindcss-animate style class names without the plugin;
+   give the common ones a real effect. */
+.animate-in.fade-in {
+  animation: vg-pop-in 0.18s ease-out both;
+}
+.animate-in.slide-in-from-left {
+  animation: vg-slide-in-left 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes vg-slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Liquid theme transition (View Transitions API)                       */
+/* ------------------------------------------------------------------ */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.vg-liquid::view-transition-new(root) {
+  /* A wobbling blob (SMIL-animated) used as the reveal mask; ThemeContext
+     scales and positions it from the toggle's coordinates. */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100 8C146 6 186 44 192 96S160 192 104 194 8 158 8 104 54 10 100 8Z'%3E%3Canimate attributeName='d' dur='.7s' repeatCount='indefinite' values='M100 8C146 6 186 44 192 96S160 192 104 194 8 158 8 104 54 10 100 8Z;M104 6C156 12 190 52 190 104S150 196 96 192 6 150 10 96 52 0 104 6Z;M96 10C142 0 194 40 192 100S166 190 108 196 12 164 6 108 50 20 96 10Z;M100 8C146 6 186 44 192 96S160 192 104 194 8 158 8 104 54 10 100 8Z'/%3E%3C/path%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100 8C146 6 186 44 192 96S160 192 104 194 8 158 8 104 54 10 100 8Z'%3E%3Canimate attributeName='d' dur='.7s' repeatCount='indefinite' values='M100 8C146 6 186 44 192 96S160 192 104 194 8 158 8 104 54 10 100 8Z;M104 6C156 12 190 52 190 104S150 196 96 192 6 150 10 96 52 0 104 6Z;M96 10C142 0 194 40 192 100S166 190 108 196 12 164 6 108 50 20 96 10Z;M100 8C146 6 186 44 192 96S160 192 104 194 8 158 8 104 54 10 100 8Z'/%3E%3C/path%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 0 0;
+  mask-size: 0 0;
+}
+
+html.vg-liquid::view-transition-old(root) {
+  z-index: -1;
+}
+
+/* Fallback when View Transitions are unavailable: a quick cross-fade of colors. */
+html.vg-theme-fade *,
+html.vg-theme-fade *::before,
+html.vg-theme-fade *::after {
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease,
+    color 0.45s ease,
+    fill 0.45s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Leaflet                                                              */
+/* ------------------------------------------------------------------ */
 
 .leaflet-div-icon {
   background: transparent !important;
@@ -46,3 +450,31 @@ html, body {
   display: none !important;
 }
 
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: var(--vg-bg);
+}
+
+.leaflet-bar a,
+.leaflet-control-zoom a {
+  background-color: var(--color-surface) !important;
+  color: var(--color-slate-700) !important;
+  border-color: var(--color-slate-200) !important;
+}
+
+.leaflet-control-attribution {
+  background: var(--color-card) !important;
+  color: var(--color-slate-500) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-blue-600) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-surface);
+  color: var(--color-slate-800);
+}

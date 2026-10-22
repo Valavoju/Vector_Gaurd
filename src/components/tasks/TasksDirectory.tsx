@@ -13,6 +13,28 @@ import {
 import { useApp } from '../../context/AppContext';
 import { TaskRecord } from '../../types';
 
+const PRIORITY_BADGE: Record<string, string> = {
+  Critical: 'bg-red-100 text-red-800',
+  High: 'bg-orange-100 text-orange-800',
+  Medium: 'bg-amber-100 text-amber-800',
+  Low: 'bg-slate-100 text-slate-700',
+};
+
+const deadlineFormatter = new Intl.DateTimeFormat('en-IN', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+  timeZone: 'UTC',
+});
+
+const formatDeadline = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : `${deadlineFormatter.format(date)} UTC`;
+};
+
 export const TasksDirectory: React.FC = () => {
   const { tasks, setSelectedHotspotId, setDispatchModalHotspotId, hotspots, setActiveView } = useApp();
 
@@ -63,7 +85,7 @@ export const TasksDirectory: React.FC = () => {
       </div>
 
       {/* 2. Filter & Search Bar */}
-      <div className="bg-white rounded-xl border border-slate-200/90 p-3 sm:p-4 shadow-2xs flex flex-col sm:flex-row gap-3">
+      <div className="bg-card rounded-xl border border-slate-200/90 p-3 sm:p-4 shadow-2xs flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -71,7 +93,7 @@ export const TasksDirectory: React.FC = () => {
             placeholder="Search tasks by ID, hotspot, officer, ward, or city..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+            className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-card transition"
           />
         </div>
 
@@ -90,7 +112,7 @@ export const TasksDirectory: React.FC = () => {
       </div>
 
       {/* 3. Task Table (Desktop) & Cards (Mobile) */}
-      <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
+      <div className="bg-card rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
         
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto">
@@ -118,7 +140,7 @@ export const TasksDirectory: React.FC = () => {
                   <tr key={task.task_id} className="hover:bg-slate-50/80 transition">
                     
                     {/* Task ID */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 font-mono font-bold text-slate-900">
+                    <td className="p-3.5 sm:px-4 sm:py-3.5 font-mono font-bold text-slate-900 whitespace-nowrap">
                       {task.task_id}
                     </td>
 
@@ -131,34 +153,32 @@ export const TasksDirectory: React.FC = () => {
 
                     {/* Priority & Action */}
                     <td className="p-3.5 sm:px-4 sm:py-3.5 max-w-xs">
-                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-1 ${
-                        task.priority === 'Critical' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
-                      }`}>
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-1 ${PRIORITY_BADGE[task.priority] ?? PRIORITY_BADGE.Medium}`}>
                         {task.priority} Priority
                       </span>
                       <div className="text-slate-700 text-xs font-medium truncate">{task.recommended_action}</div>
                     </td>
 
                     {/* Assigned Officer */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5">
+                    <td className="p-3.5 sm:px-4 sm:py-3.5 min-w-[160px]">
                       <div className="font-semibold text-slate-900">{task.assigned_officer}</div>
                       <div className="text-[11px] text-slate-500">{task.assigned_team}</div>
                     </td>
 
                     {/* Deadline */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 font-mono text-xs text-slate-600">
-                      {task.deadline}
+                    <td className="p-3.5 sm:px-4 sm:py-3.5 text-xs text-slate-600 whitespace-nowrap" title={task.deadline}>
+                      {formatDeadline(task.deadline)}
                     </td>
 
                     {/* Status */}
                     <td className="p-3.5 sm:px-4 sm:py-3.5">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold ${
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold whitespace-nowrap ${
                         task.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-800' :
                         task.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
                         task.status === 'AWAITING_VERIFICATION' ? 'bg-purple-100 text-purple-800' :
                         'bg-amber-100 text-amber-800'
                       }`}>
-                        {task.status.replace('_', ' ')}
+                        {task.status.replace(/_/g, ' ')}
                       </span>
                     </td>
 
@@ -169,7 +189,7 @@ export const TasksDirectory: React.FC = () => {
                           setSelectedHotspotId(task.hotspot_id);
                           setActiveView('RISK_MAP');
                         }}
-                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 transition"
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-slate-100 hover:bg-slate-200 text-slate-800 transition"
                       >
                         Inspect on Map
                       </button>
@@ -189,7 +209,7 @@ export const TasksDirectory: React.FC = () => {
             </div>
           ) : (
             filteredTasks.map(task => (
-              <div key={task.task_id} className="p-4 space-y-3 bg-white">
+              <div key={task.task_id} className="p-4 space-y-3 bg-card">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">

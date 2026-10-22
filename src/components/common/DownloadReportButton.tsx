@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FileText, Loader2, CheckCircle2, Download } from 'lucide-react';
 import { HotspotRecord, TaskRecord } from '../../types';
 import { useApp } from '../../context/AppContext';
-import { generateVerificationSummaryPDF } from '../../utils/pdfGenerator';
 
 interface DownloadReportButtonProps {
   hotspot: HotspotRecord;
@@ -38,6 +37,8 @@ export const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
       setIsDone(false);
       setStatusMessage('Generating verification report...');
 
+      // jsPDF is large; load it only when a report is actually requested.
+      const { generateVerificationSummaryPDF } = await import('../../utils/pdfGenerator');
       const filename = await generateVerificationSummaryPDF(
         hotspot,
         associatedTask,
@@ -78,7 +79,7 @@ export const DownloadReportButton: React.FC<DownloadReportButtonProps> = ({
   if (variant === 'secondary') {
     variantClasses = 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700';
   } else if (variant === 'outline') {
-    variantClasses = 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-2xs';
+    variantClasses = 'bg-card hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-2xs';
   } else if (variant === 'dark') {
     variantClasses = 'bg-indigo-950/80 hover:bg-indigo-900 text-indigo-200 border border-indigo-700/60 shadow-xs';
   } else if (variant === 'compact') {

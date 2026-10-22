@@ -28,6 +28,8 @@ interface RealisticVisualEvidenceProps {
   showAdditionalAngles?: boolean;
   showMetadataCards?: boolean;
   compact?: boolean;
+  /** Hide when the surrounding view already offers the report download. */
+  showReportButton?: boolean;
 }
 
 export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = ({
@@ -36,6 +38,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
   showAdditionalAngles = true,
   showMetadataCards = true,
   compact = false,
+  showReportButton = true,
 }) => {
   const [selectedAngle, setSelectedAngle] = useState<AdditionalAngleEvidence | null>(null);
   const [activePhotoModal, setActivePhotoModal] = useState<{ url: string; title: string; subtitle: string; tags?: string[] } | null>(null);
@@ -80,7 +83,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {targetHotspot && (
+          {showReportButton && targetHotspot && (
             <DownloadReportButton
               hotspot={targetHotspot}
               task={task}
@@ -103,7 +106,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         
         {/* ================= BEFORE INTERVENTION CARD ================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+        <div className="bg-card rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
           
           {/* Card Title Bar */}
           <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
@@ -121,7 +124,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
 
           {/* Photographic Viewport with Embedded Watermark */}
           <div 
-            className="relative bg-slate-950 aspect-4/3 w-full overflow-hidden group cursor-pointer"
+            className="vg-island relative bg-slate-950 aspect-4/3 w-full overflow-hidden group cursor-pointer"
             onClick={() => setActivePhotoModal({
               url: beforeImageUrl,
               title: `Before Intervention — ${hotspotId}`,
@@ -228,7 +231,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
         </div>
 
         {/* ================= AFTER INTERVENTION CARD ================= */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
+        <div className="bg-card rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col">
           
           {/* Card Title Bar */}
           <div className="bg-slate-50 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
@@ -246,7 +249,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
 
           {/* Photographic Viewport with Embedded Watermark */}
           <div 
-            className="relative bg-slate-950 aspect-4/3 w-full overflow-hidden group cursor-pointer"
+            className="vg-island relative bg-slate-950 aspect-4/3 w-full overflow-hidden group cursor-pointer"
             onClick={() => setActivePhotoModal({
               url: afterImageUrl,
               title: `After Intervention — ${hotspotId}`,
@@ -356,7 +359,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
 
       {/* ================= ADDITIONAL EVIDENCE (MULTIPLE ANGLES) ================= */}
       {showAdditionalAngles && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3.5">
+        <div className="bg-card rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs space-y-3.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-indigo-600" />
@@ -374,7 +377,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
               <div 
                 key={angle.id}
                 onClick={() => setSelectedAngle(angle)}
-                className="group relative bg-slate-950 rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-500 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col"
+                className="vg-island group relative bg-slate-950 rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-500 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col"
               >
                 {/* Photo */}
                 <div className="relative aspect-4/3 overflow-hidden">
@@ -403,7 +406,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
                 </div>
 
                 {/* Info */}
-                <div className="p-2 bg-white flex-1 flex flex-col justify-between">
+                <div className="p-2 bg-card flex-1 flex flex-col justify-between">
                   <div>
                     <div className="font-bold text-[11px] text-slate-900 truncate">
                       {angle.title}
@@ -427,7 +430,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
           {/* 1. Location Details */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+          <div className="bg-card rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <MapPin className="w-4 h-4 text-indigo-600" />
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -460,7 +463,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
           </div>
 
           {/* 2. Timeline */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+          <div className="bg-card rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <Clock className="w-4 h-4 text-amber-600" />
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -508,7 +511,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
           </div>
 
           {/* 3. Officer Verification */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+          <div className="bg-card rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
               <UserCheck className="w-4 h-4 text-emerald-600" />
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
@@ -556,11 +559,11 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
       {/* ================= MODAL LIGHTBOX FOR MULTI-ANGLE ZOOM ================= */}
       {selectedAngle && (
         <div 
-          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 vg-scrim flex items-center justify-center p-4"
           onClick={() => setSelectedAngle(null)}
         >
           <div 
-            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl text-white"
+            className="vg-island bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -605,11 +608,11 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
       {/* ================= MODAL LIGHTBOX FOR BEFORE/AFTER ZOOM ================= */}
       {activePhotoModal && (
         <div 
-          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 vg-scrim flex items-center justify-center p-4"
           onClick={() => setActivePhotoModal(null)}
         >
           <div 
-            className="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl text-white"
+            className="vg-island bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl text-white"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">

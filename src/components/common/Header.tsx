@@ -1,308 +1,488 @@
-import React, { useState } from 'react';
-import { 
-  ShieldAlert, 
-  MapPin, 
-  RotateCcw, 
-  Sliders, 
-  CheckSquare, 
-  User, 
-  Sparkles,
-  Layers,
-  ChevronDown,
-  Activity,
-  Globe2,
-  ShieldCheck,
-  Check,
-  Lock,
-  Smartphone,
-  Eye,
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
   AlertTriangle,
-  Info,
   Bell,
-  RefreshCw,
-  Compass,
+  CheckSquare,
+  ChevronDown,
+  ClipboardList,
+  CornerDownLeft,
+  Database,
+  Layers,
   Menu,
+  Search,
+  Sparkles,
+  UploadCloud,
   X,
-  Database
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
+import { BrandLogo } from './BrandLogo';
+import { ThemeToggle } from './ThemeToggle';
+import { ADMIN_FOOTER_NAV, ADMIN_NAV, NavItem } from './navConfig';
 
-export const Header: React.FC = () => {
-  const { 
-    currentUser, 
-    setCurrentUser, 
-    switchUserRole,
-    demoMode, 
-    setDemoMode, 
-    resetDemo, 
-    activeView, 
-    setActiveView,
-    tasks,
-    hotspots,
-    registeredCitizen,
-    citizenSubmissions,
-    isMobileNavOpen,
-    setIsMobileNavOpen,
-    databaseConnectionStatus
-  } = useApp();
+/** Closes a popover when the user clicks outside `ref` or presses Escape. */
+const useDismiss = (ref: React.RefObject<HTMLElement | null>, open: boolean, onClose: () => void) => {
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [ref, open, onClose]);
+};
 
-  const [isRoleMenuOpen, setIsRoleMenuOpen] = useState<boolean>(false);
-  const [showNotifications, setShowNotifications] = useState<boolean>(false);
+const useClock = () => {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(t);
+  }, []);
+  return now;
+};
 
-  const awaitingCount = tasks.filter(t => t.status === 'AWAITING_VERIFICATION').length;
+const istFormatter = new Intl.DateTimeFormat('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  day: '2-digit',
+  month: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
 
-  const handleRoleChange = (role: UserRole) => {
-    setIsRoleMenuOpen(false);
-    if (switchUserRole) {
-      switchUserRole(role);
-    } else if (setCurrentUser) {
-      if (role === 'CITIZEN') {
-        setCurrentUser({
-          id: 'usr-citizen-01',
-          name: registeredCitizen ? registeredCitizen.fullName : 'Citizen Sentinel',
-          role: 'CITIZEN',
-          team: 'Supporting Evidence Network'
-        });
-        setActiveView('CITIZEN_PORTAL');
-      } else if (role === 'FIELD_OFFICER') {
-        setCurrentUser({
-          id: 'usr-fo-01',
-          name: 'Rajesh Kumar',
-          role: 'FIELD_OFFICER',
-          team: 'Rapid Intervention Unit 4'
-        });
-        setActiveView('MY_TASKS');
-      } else {
-        setCurrentUser({
-          id: 'usr-admin-01',
-          name: 'Dr. Neha Sharma',
-          role: 'ADMIN',
-          team: 'Vector Surveillance Command'
-        });
-        setActiveView('DASHBOARD');
+type SearchResult =
+  | { kind: 'page'; key: string; title: string; subtitle: string; item: NavItem }
+  | { kind: 'hotspot'; key: string; title: string; subtitle: string; id: string; level: string }
+  | { kind: 'task'; key: string; title: string; subtitle: string; id: string };
+
+const LEVEL_DOT: Record<string, string> = {
+  CRITICAL: 'bg-purple-500',
+  HIGH: 'bg-red-500',
+  MODERATE: 'bg-amber-500',
+  LOW: 'bg-emerald-500',
+};
+
+const GlobalSearch: React.FC = () => {
+  const { hotspots, tasks, setActiveView, setSelectedHotspotId } = useApp();
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const [cursor, setCursor] = useState(0);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useDismiss(wrapRef, open, () => setOpen(false));
+
+  // Ctrl/Cmd + K focuses search from anywhere.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setOpen(true);
       }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const results = useMemo<SearchResult[]>(() => {
+    const q = query.trim().toLowerCase();
+    const pages = [...ADMIN_NAV.flatMap(g => g.items), ...ADMIN_FOOTER_NAV]
+      .filter(i => !q || `${i.label} ${i.description}`.toLowerCase().includes(q))
+      .slice(0, q ? 4 : 6)
+      .map<SearchResult>(item => ({ kind: 'page', key: item.id, title: item.label, subtitle: item.description, item }));
+    if (!q) return pages;
+
+    const hs = hotspots
+      .filter(h => `${h.hotspot_id} ${h.location} ${h.city} ${h.state} ${h.ward}`.toLowerCase().includes(q))
+      .slice(0, 6)
+      .map<SearchResult>(h => ({
+        kind: 'hotspot',
+        key: h.hotspot_id,
+        id: h.hotspot_id,
+        title: `${h.hotspot_id} · ${h.location}`,
+        subtitle: `${h.city}, ${h.state} · Score ${h.breeding_risk_score}`,
+        level: h.risk_level,
+      }));
+    const ts = tasks
+      .filter(t => `${t.task_id} ${t.hotspot_id} ${t.assigned_officer} ${t.location}`.toLowerCase().includes(q))
+      .slice(0, 4)
+      .map<SearchResult>(t => ({
+        kind: 'task',
+        key: t.task_id,
+        id: t.task_id,
+        title: `${t.task_id} · ${t.hotspot_id}`,
+        subtitle: `${t.assigned_officer} · ${t.status.replace(/_/g, ' ').toLowerCase()}`,
+      }));
+    return [...pages, ...hs, ...ts];
+  }, [query, hotspots, tasks]);
+
+  useEffect(() => setCursor(0), [query]);
+
+  const choose = (r: SearchResult) => {
+    if (r.kind === 'page') setActiveView(r.item.view);
+    if (r.kind === 'hotspot') setSelectedHotspotId(r.id);
+    if (r.kind === 'task') setActiveView('TASKS');
+    setOpen(false);
+    setQuery('');
+    inputRef.current?.blur();
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setCursor(c => Math.min(c + 1, results.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setCursor(c => Math.max(c - 1, 0));
+    } else if (e.key === 'Enter' && results[cursor]) {
+      e.preventDefault();
+      choose(results[cursor]);
     }
   };
 
+  const iconFor = (r: SearchResult) => {
+    if (r.kind === 'page') {
+      const Icon = r.item.icon;
+      return <Icon className="w-4 h-4 text-blue-600" />;
+    }
+    if (r.kind === 'task') return <ClipboardList className="w-4 h-4 text-emerald-600" />;
+    return <span className={`w-2.5 h-2.5 rounded-full ${LEVEL_DOT[r.level] ?? 'bg-slate-400'}`} />;
+  };
+
+  let lastKind: SearchResult['kind'] | null = null;
+  const kindLabel = { page: 'Pages', hotspot: 'Hotspots', task: 'Tasks' };
+
   return (
-    <header className="h-14 bg-white border-b border-slate-200 text-slate-800 flex items-center justify-between px-3 sm:px-4 z-40 shrink-0 select-none shadow-2xs relative">
-      
-      {/* Brand & Left Navigation Toggle */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-        
-        {/* Mobile Hamburger Toggle Button */}
+    <div ref={wrapRef} className="relative w-full max-w-md">
+      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+      <input
+        ref={inputRef}
+        id="header-global-search"
+        type="search"
+        value={query}
+        onChange={e => {
+          setQuery(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={onKeyDown}
+        placeholder="Search hotspots, tasks, pages…"
+        aria-label="Search"
+        autoComplete="off"
+        className="w-full h-10 pl-10 pr-14 rounded-xl bg-card border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-300 transition"
+      />
+      <kbd className="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 py-0.5 rounded-md border border-slate-200 bg-slate-50 text-[10px] font-mono text-slate-500 pointer-events-none">
+        Ctrl K
+      </kbd>
+
+      {open && (
+        <div className="absolute left-0 right-0 mt-2 bg-surface border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50 max-h-[70vh] overflow-y-auto animate-pop-in">
+          {results.length === 0 ? (
+            <div className="px-3 py-6 text-center text-xs text-slate-500">No matches for “{query}”.</div>
+          ) : (
+            results.map((r, i) => {
+              const header = r.kind !== lastKind ? kindLabel[r.kind] : null;
+              lastKind = r.kind;
+              return (
+                <React.Fragment key={`${r.kind}-${r.key}`}>
+                  {header && (
+                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{header}</div>
+                  )}
+                  <button
+                    onMouseEnter={() => setCursor(i)}
+                    onClick={() => choose(r)}
+                    className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-xl text-left transition ${
+                      i === cursor ? 'bg-blue-50' : ''
+                    }`}
+                  >
+                    <span className="w-8 h-8 rounded-lg bg-slate-100 grid place-items-center shrink-0">{iconFor(r)}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-xs font-bold text-slate-900 truncate">{r.title}</span>
+                      <span className="block text-[11px] text-slate-500 truncate">{r.subtitle}</span>
+                    </span>
+                    {i === cursor && <CornerDownLeft className="w-3.5 h-3.5 text-slate-400 shrink-0" />}
+                  </button>
+                </React.Fragment>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const Header: React.FC = () => {
+  const {
+    currentUser,
+    switchUserRole,
+    demoMode,
+    setDemoMode,
+    setActiveView,
+    tasks,
+    hotspots,
+    citizenSubmissions,
+    isMobileNavOpen,
+    setIsMobileNavOpen,
+    databaseConnectionStatus,
+  } = useApp();
+
+  const [isRoleMenuOpen, setIsRoleMenuOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const roleRef = useRef<HTMLDivElement>(null);
+  const bellRef = useRef<HTMLDivElement>(null);
+  useDismiss(roleRef, isRoleMenuOpen, () => setIsRoleMenuOpen(false));
+  useDismiss(bellRef, showNotifications, () => setShowNotifications(false));
+
+  const now = useClock();
+
+  // Alerts derived from live state instead of a fixed list.
+  const alerts = useMemo(() => {
+    const items: { id: string; tone: string; title: string; detail: string; icon: React.ElementType; view: string }[] = [];
+    const awaiting = tasks.filter(t => t.status === 'AWAITING_VERIFICATION');
+    awaiting.slice(0, 3).forEach(t =>
+      items.push({
+        id: `verify-${t.task_id}`,
+        tone: 'bg-violet-500',
+        title: `${t.task_id} awaiting verification`,
+        detail: `${t.hotspot_id} · ${t.location}`,
+        icon: CheckSquare,
+        view: 'VERIFICATION',
+      }),
+    );
+    const pendingCitizen = citizenSubmissions.filter(s => s.status === 'PENDING_HUMAN_VERIFICATION').length;
+    if (pendingCitizen > 0) {
+      items.push({
+        id: 'citizen',
+        tone: 'bg-fuchsia-500',
+        title: `${pendingCitizen} citizen submission${pendingCitizen > 1 ? 's' : ''} to review`,
+        detail: 'Supporting evidence network',
+        icon: UploadCloud,
+        view: 'VERIFICATION',
+      });
+    }
+    const criticalOpen = hotspots.filter(h => h.risk_level === 'CRITICAL' && h.status === 'OPEN').length;
+    if (criticalOpen > 0) {
+      items.push({
+        id: 'critical',
+        tone: 'bg-rose-500',
+        title: `${criticalOpen} critical hotspots not yet dispatched`,
+        detail: 'Score 81–100 · immediate action',
+        icon: AlertTriangle,
+        view: 'HOTSPOTS',
+      });
+    }
+    return items;
+  }, [tasks, hotspots, citizenSubmissions]);
+
+  const handleRoleChange = (role: UserRole) => {
+    setIsRoleMenuOpen(false);
+    switchUserRole(role);
+  };
+
+  const roleMeta = {
+    ADMIN: { initials: 'CR', title: 'Control Room', subtitle: 'Admin', tile: 'from-[#1452f0] to-[#22c8f5]' },
+    FIELD_OFFICER: { initials: 'FO', title: 'Field Unit', subtitle: 'Field Officer', tile: 'from-emerald-500 to-teal-400' },
+    CITIZEN: { initials: 'CZ', title: 'Citizen Sentinel', subtitle: 'Citizen', tile: 'from-violet-500 to-fuchsia-400' },
+  }[currentUser.role];
+
+  const roles: { role: UserRole; id: string; title: string; detail: string; tile: string; initials: string }[] = [
+    { role: 'ADMIN', id: 'role-switch-admin', title: 'Control Room Admin', detail: 'GIS operations, dispatch & verification', tile: 'from-[#1452f0] to-[#22c8f5]', initials: 'CR' },
+    { role: 'FIELD_OFFICER', id: 'role-switch-officer', title: 'Field Officer', detail: 'Mobile inspection, GPS photos & remediation', tile: 'from-emerald-500 to-teal-400', initials: 'FO' },
+    { role: 'CITIZEN', id: 'role-switch-citizen', title: 'Citizen Sentinel', detail: 'Community evidence & verification', tile: 'from-violet-500 to-fuchsia-400', initials: 'CZ' },
+  ];
+
+  const dbOk = databaseConnectionStatus === 'CONNECTED';
+
+  return (
+    <header className="h-16 shrink-0 vg-glass rounded-2xl flex items-center justify-between gap-3 px-3 sm:px-4 relative z-40 select-none">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
         <button
           id="mobile-nav-toggle-btn"
-          aria-label="Toggle Navigation Menu"
+          aria-label="Toggle navigation menu"
+          aria-expanded={!!isMobileNavOpen}
           onClick={() => setIsMobileNavOpen?.(!isMobileNavOpen)}
-          className="md:hidden p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition shrink-0"
+          className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition shrink-0"
         >
-          {isMobileNavOpen ? <X className="w-5 h-5 text-slate-900" /> : <Menu className="w-5 h-5" />}
+          {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
 
-        <div 
-          onClick={() => {
-            if (currentUser.role === 'ADMIN') setActiveView('DASHBOARD');
-          }}
-          className="flex items-center gap-2 cursor-pointer group shrink-0"
+        <button
+          className="md:hidden min-w-0"
+          onClick={() => currentUser.role === 'ADMIN' && setActiveView('DASHBOARD')}
+          aria-label="VectorGuard home"
         >
-          <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white shadow-xs group-hover:bg-teal-700 transition shrink-0">
-            <ShieldCheck className="w-5 h-5 text-white" />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 font-sans truncate">
-                VectorGuard <span className="text-teal-600">AI</span>
-              </span>
-            </div>
-            <div className="text-[10px] sm:text-[11px] text-slate-500 font-medium hidden xs:block truncate">
-              Predict. Verify. Prevent. Learn.
-            </div>
-          </div>
-        </div>
-
-        {/* Demo / Pilot Data Warning Pill */}
-        <div className="hidden md:flex items-center gap-1.5 ml-2">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 bg-amber-50/90 border border-amber-300/80 px-3 py-0.5 rounded-full font-sans shadow-2xs whitespace-nowrap">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-            <span>DEMO / PILOT DATA — ILLUSTRATIVE</span>
+          <span className="sm:hidden">
+            <BrandLogo compact />
           </span>
-        </div>
+          <span className="hidden sm:block">
+            <BrandLogo tagline={false} />
+          </span>
+        </button>
+
+        {currentUser.role === 'ADMIN' ? (
+          <div className="hidden md:block flex-1 min-w-0">
+            <GlobalSearch />
+          </div>
+        ) : (
+          <div className="hidden md:block min-w-0">
+            <div className="text-sm font-bold text-slate-900 truncate">
+              {currentUser.role === 'FIELD_OFFICER' ? 'Field Operations Terminal' : 'Citizen Evidence Portal'}
+            </div>
+            <div className="text-[11px] text-slate-500 truncate">
+              {currentUser.role === 'FIELD_OFFICER' ? 'GPS-verified remediation workflow' : 'Help your city prevent vector breeding'}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Right Operational Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        
-        {/* Database Connection Status Button */}
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <button
-          onClick={() => setActiveView('DATA_ML')}
-          className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 text-xs font-mono transition"
-          title="Persistent Cloud Database Active — Click to open 9 Tables & Architecture"
+          onClick={() => currentUser.role === 'ADMIN' && setActiveView('DATA_ML')}
+          className="hidden lg:flex items-center gap-2 h-9 px-3 rounded-xl bg-card border border-slate-200 hover:border-blue-300 text-xs transition"
+          title="Persistent cloud database — open Data & ML"
         >
-          <span className={`w-2 h-2 rounded-full ${databaseConnectionStatus === 'CONNECTED' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-          <Database className="w-3 h-3 text-sky-600" />
-          <span className="font-semibold text-slate-700">DB: {databaseConnectionStatus === 'CONNECTED' ? 'Connected' : 'Syncing'}</span>
+          <span className="relative flex w-2 h-2">
+            {dbOk && <span className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-60" />}
+            <span className={`relative w-2 h-2 rounded-full ${dbOk ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+          </span>
+          <Database className="w-3.5 h-3.5 text-blue-600" />
+          <span className="font-semibold text-slate-700">{dbOk ? 'Connected' : 'Syncing'}</span>
         </button>
 
-        {/* System Operational & Local Clock */}
-        <div className="hidden xl:flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-mono text-slate-700 shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span className="font-semibold text-slate-800">System Operational</span>
-          <span className="text-slate-300">|</span>
-          <span className="text-slate-500 text-[11px]">09 Sept 2026, 13:59 IST</span>
+        <div className="hidden xl:flex flex-col items-end leading-tight px-2" title="Indian Standard Time">
+          <span className="text-xs font-bold text-slate-800 tabular-nums">{istFormatter.format(now)}</span>
+          <span className="text-[10px] text-slate-500 font-medium">IST · System operational</span>
         </div>
 
-        {/* Demo Mode Toggle Button */}
         <button
           id="header-demo-guide-toggle"
           onClick={() => setDemoMode?.(!demoMode)}
-          className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-sans font-bold flex items-center gap-1 sm:gap-1.5 transition shadow-xs shrink-0 ${
-            demoMode 
-              ? 'bg-slate-900 text-amber-300 ring-2 ring-amber-400/40' 
-              : 'bg-slate-900 text-amber-300 hover:bg-slate-800'
+          className={`h-9 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shrink-0 ${
+            demoMode ? 'vg-btn-primary ring-2 ring-amber-300/70' : 'vg-btn-primary'
           }`}
-          title="Toggle 18-Step Interactive Walkthrough Guide"
+          title="Toggle the 18-step interactive walkthrough"
+          aria-pressed={!!demoMode}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300/30 shrink-0" />
-          <span className="hidden xs:inline">Demo Mode</span>
-          <span className="xs:hidden">Demo</span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+          <span className="hidden sm:inline">Demo</span>
         </button>
 
-        {/* Notifications */}
-        <div className="relative shrink-0">
+        <ThemeToggle />
+
+        <div ref={bellRef} className="relative shrink-0">
           <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="p-1.5 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition relative"
-            title="Notifications"
+            onClick={() => setShowNotifications(s => !s)}
+            className="relative w-9 h-9 grid place-items-center rounded-xl bg-card border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-blue-300 transition"
+            aria-label={`Notifications (${alerts.length})`}
+            aria-expanded={showNotifications}
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
-              3
-            </span>
+            {alerts.length > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold grid place-items-center ring-2 ring-[var(--vg-bg)]">
+                {alerts.length}
+              </span>
+            )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-white border border-slate-200 rounded-xl shadow-xl p-3 z-50 text-xs">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 text-slate-500 font-bold uppercase text-[10px]">
-                <span>System Notifications</span>
-                <span className="text-blue-600 font-semibold">{awaitingCount || 3} Active</span>
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-24px)] bg-surface border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-pop-in">
+              <div className="flex items-center justify-between px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <span>Live alerts</span>
+                <span className="text-blue-600">{alerts.length} active</span>
               </div>
-              <div className="py-2 space-y-2 text-slate-700">
-                <div className="flex items-start gap-2 p-1.5 hover:bg-slate-50 rounded-lg">
-                  <span className="w-2 h-2 rounded-full bg-red-500 mt-1 shrink-0"></span>
-                  <div className="text-[11px]">
-                    <div className="font-bold text-slate-900">VG-1042 Inspection Pending</div>
-                    <div className="text-slate-500 text-[10px]">Ward 12, Banjara Hills, Hyderabad</div>
-                  </div>
+              {alerts.length === 0 ? (
+                <div className="px-3 py-6 text-center text-xs text-slate-500">All clear — nothing needs attention.</div>
+              ) : (
+                <div className="space-y-1">
+                  {alerts.map(a => {
+                    const Icon = a.icon;
+                    return (
+                      <button
+                        key={a.id}
+                        onClick={() => {
+                          if (currentUser.role === 'ADMIN') setActiveView(a.view);
+                          setShowNotifications(false);
+                        }}
+                        className="w-full flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-100 text-left transition"
+                      >
+                        <span className={`w-7 h-7 rounded-lg ${a.tone} text-white grid place-items-center shrink-0`}>
+                          <Icon className="w-3.5 h-3.5" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-xs font-bold text-slate-900">{a.title}</span>
+                          <span className="block text-[11px] text-slate-500 truncate">{a.detail}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <div className="flex items-start gap-2 p-1.5 hover:bg-slate-50 rounded-lg">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 mt-1 shrink-0"></span>
-                  <div className="text-[11px]">
-                    <div className="font-bold text-slate-900">Weather API Telemetry Synced</div>
-                    <div className="text-slate-500 text-[10px]">Real-time precipitation updated</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* User Profile / Role Perspective Switcher */}
-        <div className="relative shrink-0">
+        <div ref={roleRef} className="relative shrink-0">
           <button
             id="header-role-switcher-btn"
-            onClick={() => setIsRoleMenuOpen(!isRoleMenuOpen)}
-            className="flex items-center gap-1.5 sm:gap-2.5 pl-1 pr-1.5 sm:pr-2 py-1 rounded-full hover:bg-slate-100 transition border border-transparent hover:border-slate-200"
+            onClick={() => setIsRoleMenuOpen(o => !o)}
+            aria-expanded={isRoleMenuOpen}
+            aria-haspopup="menu"
+            className="flex items-center gap-2 h-10 pl-1 pr-2 rounded-xl hover:bg-card border border-transparent hover:border-slate-200 transition"
           >
-            <div className="w-7 h-7 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0">
-              {currentUser.role === 'ADMIN' ? 'CR' : currentUser.role === 'FIELD_OFFICER' ? 'FO' : 'CZ'}
-            </div>
-            <div className="text-left hidden sm:block">
-              <div className="font-bold text-xs text-slate-900 leading-tight">
-                {currentUser.role === 'ADMIN' ? 'Control Room' : 
-                 currentUser.role === 'FIELD_OFFICER' ? 'Field Unit' : 'Citizen Sentinel'}
-              </div>
-              <div className="text-[10px] text-slate-500 leading-tight font-medium">
-                {currentUser.role === 'ADMIN' ? 'Admin' : 
-                 currentUser.role === 'FIELD_OFFICER' ? 'Field Officer' : 'Citizen'}
-              </div>
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <span className={`w-8 h-8 rounded-lg bg-gradient-to-br ${roleMeta.tile} text-white text-xs font-bold grid place-items-center shadow-md shrink-0`}>
+              {roleMeta.initials}
+            </span>
+            <span className="text-left hidden sm:block">
+              <span className="block font-bold text-xs text-slate-900 leading-tight">{roleMeta.title}</span>
+              <span className="block text-[10px] text-slate-500 leading-tight font-medium">{roleMeta.subtitle}</span>
+            </span>
+            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform ${isRoleMenuOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isRoleMenuOpen && (
-            <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-24px)] bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in duration-100">
-              <div className="p-2.5 bg-slate-50 border-b border-slate-200">
-                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-                  SWITCH ROLE PERSPECTIVE
-                </span>
+            <div role="menu" className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-surface border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 animate-pop-in">
+              <div className="px-3.5 py-2.5 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                Switch role perspective
               </div>
-
               <div className="p-1.5 space-y-1">
-                {/* Admin */}
-                <button
-                  id="role-switch-admin"
-                  onClick={() => handleRoleChange('ADMIN')}
-                  className={`w-full text-left p-2 rounded-lg text-xs transition flex items-start gap-2.5 ${
-                    currentUser.role === 'ADMIN' 
-                      ? 'bg-blue-50 text-blue-900 font-semibold' 
-                      : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                    CR
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900">Control Room Admin</div>
-                    <div className="text-[11px] text-slate-500">GIS Operations, Task Dispatch & Verification</div>
-                  </div>
-                </button>
-
-                {/* Field Officer */}
-                <button
-                  id="role-switch-officer"
-                  onClick={() => handleRoleChange('FIELD_OFFICER')}
-                  className={`w-full text-left p-2 rounded-lg text-xs transition flex items-start gap-2.5 ${
-                    currentUser.role === 'FIELD_OFFICER' 
-                      ? 'bg-emerald-50 text-emerald-900 font-semibold' 
-                      : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                    FO
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900">Field Officer</div>
-                    <div className="text-[11px] text-slate-500">Mobile Inspection, GPS Photos & Remediation</div>
-                  </div>
-                </button>
-
-                {/* Citizen */}
-                <button
-                  id="role-switch-citizen"
-                  onClick={() => handleRoleChange('CITIZEN')}
-                  className={`w-full text-left p-2 rounded-lg text-xs transition flex items-start gap-2.5 ${
-                    currentUser.role === 'CITIZEN' 
-                      ? 'bg-purple-50 text-purple-900 font-semibold' 
-                      : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="w-6 h-6 rounded-md bg-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                    CZ
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900">Citizen Sentinel</div>
-                    <div className="text-[11px] text-slate-500">Community Evidence & Verification</div>
-                  </div>
-                </button>
+                {roles.map(r => {
+                  const active = currentUser.role === r.role;
+                  return (
+                    <button
+                      key={r.role}
+                      id={r.id}
+                      role="menuitemradio"
+                      aria-checked={active}
+                      onClick={() => handleRoleChange(r.role)}
+                      className={`w-full text-left p-2 rounded-xl text-xs transition flex items-start gap-2.5 ${
+                        active ? 'bg-blue-50 ring-1 ring-blue-200' : 'hover:bg-slate-100'
+                      }`}
+                    >
+                      <span className={`w-8 h-8 rounded-lg bg-gradient-to-br ${r.tile} text-white font-bold grid place-items-center shrink-0`}>
+                        {r.initials}
+                      </span>
+                      <span>
+                        <span className="block font-bold text-slate-900">{r.title}</span>
+                        <span className="block text-[11px] text-slate-500">{r.detail}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="px-3.5 py-2 border-t border-slate-200 flex items-center gap-1.5 text-[10px] text-slate-500">
+                <Layers className="w-3 h-3" /> Demo personas share one dataset.
               </div>
             </div>
           )}
         </div>
-
       </div>
-
     </header>
   );
 };

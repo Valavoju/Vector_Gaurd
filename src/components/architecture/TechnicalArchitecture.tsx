@@ -253,7 +253,7 @@ export const TechnicalArchitecture: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-[1560px] mx-auto space-y-6">
       
       {/* Top Navigation / Tab Header */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="vg-hero rounded-2xl p-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center ring-1 ring-sky-500/30">
             <Database className="w-6 h-6" />
@@ -275,7 +275,7 @@ export const TechnicalArchitecture: React.FC = () => {
         <div className="flex items-center gap-2 bg-slate-800/90 p-1 rounded-xl border border-slate-700">
           <button
             onClick={() => setActiveTab('DATABASE')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
               activeTab === 'DATABASE'
                 ? 'bg-sky-500 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -286,7 +286,7 @@ export const TechnicalArchitecture: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('PIPELINE')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
               activeTab === 'PIPELINE'
                 ? 'bg-sky-500 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -299,7 +299,7 @@ export const TechnicalArchitecture: React.FC = () => {
       </div>
 
       {/* SECTION 1: DATABASE CONNECTION HEALTH & TRANSPARENCY BAR */}
-      <div className="bg-slate-900/95 rounded-2xl border border-slate-800 p-5 shadow-lg backdrop-blur-xs space-y-4">
+      <div className="vg-panel-dark rounded-2xl p-5 shadow-lg backdrop-blur-xs space-y-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           
           <div className="space-y-2">
@@ -426,20 +426,20 @@ export const TechnicalArchitecture: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Database className="w-4 h-4 text-sky-500" />
                 Persistent Database Datasets (9 Tables)
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Click <strong className="text-slate-700 dark:text-slate-300">[View Records]</strong> on any table card to inspect rows, schema properties, and persistent evidence.
+              <p className="text-xs text-slate-500">
+                Click <strong className="text-slate-700">[View Records]</strong> on any table card to inspect rows, schema properties, and persistent evidence.
               </p>
             </div>
 
             <div className="flex items-center gap-2 text-xs">
-              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-medium">
+              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-medium">
                 Total Tables: 9
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 font-medium">
+              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-medium">
                 Total Records: {
                   DATASET_TABLES.reduce((acc, t) => acc + getTableRows(t.key).length, 0)
                 }
@@ -454,40 +454,40 @@ export const TechnicalArchitecture: React.FC = () => {
               const count = rows.length;
               const Icon = table.icon;
 
-              let badgeColor = 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:border-blue-800';
+              let badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
               if (table.sourceTag === 'MODEL OUTPUTS') {
-                badgeColor = 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800';
+                badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
               } else if (table.sourceTag === 'EXTERNAL DATA') {
-                badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-400 dark:border-indigo-800';
+                badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200';
               } else if (table.sourceTag === 'EVIDENCE') {
-                badgeColor = 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-400 dark:border-purple-800';
+                badgeColor = 'bg-purple-50 text-purple-700 border-purple-200';
               }
 
               return (
                 <div 
                   key={table.key}
-                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                  className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
                 >
                   <div className="space-y-3">
                     
                     {/* Header Row */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-xs ring-1 ring-slate-200 dark:ring-slate-700">
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs ring-1 ring-slate-200">
                           <Icon className="w-4 h-4 text-sky-500" />
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-slate-900 dark:text-white tracking-tight">
+                          <h4 className="font-bold text-sm text-slate-900 tracking-tight">
                             {table.title}
                           </h4>
                           <span className="font-mono text-[11px] text-slate-400">
-                            table: <code className="text-sky-600 dark:text-sky-400">{table.key}</code>
+                            table: <code className="text-sky-600">{table.key}</code>
                           </span>
                         </div>
                       </div>
 
                       <div className="text-right">
-                        <span className="text-lg font-bold font-mono text-slate-900 dark:text-white">
+                        <span className="text-lg font-bold font-mono text-slate-900">
                           {count}
                         </span>
                         <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
@@ -496,7 +496,7 @@ export const TechnicalArchitecture: React.FC = () => {
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       {table.description}
                     </p>
 
@@ -511,21 +511,21 @@ export const TechnicalArchitecture: React.FC = () => {
 
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-slate-400">Origin Feed:</span>
-                        <span className="text-slate-700 dark:text-slate-300 font-medium text-right truncate max-w-[180px]" title={table.primarySource}>
+                        <span className="text-slate-700 font-medium text-right truncate max-w-[180px]" title={table.primarySource}>
                           {table.primarySource}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-slate-400">Primary Key:</span>
-                        <span className="font-mono text-slate-600 dark:text-slate-400 font-semibold text-[10px]">
+                        <span className="font-mono text-slate-600 font-semibold text-[10px]">
                           {table.primaryKey}
                         </span>
                       </div>
                     </div>
 
                     {table.key === 'learning_outcomes' && (
-                      <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 text-[11px] text-amber-800 dark:text-amber-300 leading-normal">
+                      <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800 leading-normal">
                         <strong>Feedback Notice:</strong> Verified field outcomes are retained as feedback data for future model calibration and retraining.
                       </div>
                     )}
@@ -533,7 +533,7 @@ export const TechnicalArchitecture: React.FC = () => {
                   </div>
 
                   {/* Card Bottom CTA */}
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                     <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
                       DEMO / PILOT DATA — ILLUSTRATIVE
                     </span>
@@ -543,7 +543,7 @@ export const TechnicalArchitecture: React.FC = () => {
                         setInspectTable(table.key);
                         setSearchQuery('');
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
+                      className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
                     >
                       <TableIcon className="w-3.5 h-3.5" />
                       View Records
@@ -562,7 +562,7 @@ export const TechnicalArchitecture: React.FC = () => {
       {activeTab === 'PIPELINE' && (
         <div className="space-y-6">
           
-          <div className="bg-slate-900 rounded-2xl p-6 text-white border border-slate-800 space-y-4">
+          <div className="vg-panel-dark rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2 text-sky-400">
               <Cpu className="w-5 h-5" />
               <h3 className="font-bold text-sm uppercase tracking-wider">Predictive Decision-Support Formula</h3>
@@ -598,15 +598,15 @@ export const TechnicalArchitecture: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Stage 1: Data Ingestion */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs">
                   1
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-xs">Multi-Modal Ingestion</h3>
+                <h3 className="font-bold text-slate-900 text-xs">Multi-Modal Ingestion</h3>
               </div>
               
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <ul className="space-y-2 text-xs text-slate-600">
                 <li className="flex items-start gap-2">
                   <Satellite className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
                   <span><strong>Satellite & Earth Obs:</strong> Sentinel-2 multi-spectral NDVI/NDWI indices & Planet 3m optical.</span>
@@ -623,40 +623,40 @@ export const TechnicalArchitecture: React.FC = () => {
             </div>
 
             {/* Stage 2: Tiered Imagery Hierarchy */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
                   2
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-xs">Tiered Imagery Hierarchy</h3>
+                <h3 className="font-bold text-slate-900 text-xs">Tiered Imagery Hierarchy</h3>
               </div>
 
-              <div className="space-y-2 text-xs text-slate-700 dark:text-slate-300">
-                <div className="p-2 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-800">
-                  <div className="font-bold text-slate-900 dark:text-white">Level 1: Govt GIS / Satellite</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Macro-scale citywide coverage (10m–30m resolution)</div>
+              <div className="space-y-2 text-xs text-slate-700">
+                <div className="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                  <div className="font-bold text-slate-900">Level 1: Govt GIS / Satellite</div>
+                  <div className="text-[11px] text-slate-500">Macro-scale citywide coverage (10m–30m resolution)</div>
                 </div>
-                <div className="p-2 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-800">
-                  <div className="font-bold text-slate-900 dark:text-white">Level 2: Street / Municipal Cameras</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">Fixed public traffic points & vehicle sweeps</div>
+                <div className="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                  <div className="font-bold text-slate-900">Level 2: Street / Municipal Cameras</div>
+                  <div className="text-[11px] text-slate-500">Fixed public traffic points & vehicle sweeps</div>
                 </div>
-                <div className="p-2 bg-purple-50 dark:bg-purple-950/60 rounded-lg border border-purple-200 dark:border-purple-800">
-                  <div className="font-bold text-purple-950 dark:text-purple-200">Level 3: Targeted Drone Micro-Surveys</div>
-                  <div className="text-[11px] text-purple-900 dark:text-purple-300">Triggered ONLY on top 5% high-risk ambiguous hotspots</div>
+                <div className="p-2 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="font-bold text-purple-950">Level 3: Targeted Drone Micro-Surveys</div>
+                  <div className="text-[11px] text-purple-900">Triggered ONLY on top 5% high-risk ambiguous hotspots</div>
                 </div>
               </div>
             </div>
 
             {/* Stage 3: Computer Vision Engine */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">
                   3
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-xs">Computer Vision Engine</h3>
+                <h3 className="font-bold text-slate-900 text-xs">Computer Vision Engine</h3>
               </div>
 
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <ul className="space-y-2 text-xs text-slate-600">
                 <li className="flex items-start gap-2">
                   <Eye className="w-4 h-4 text-indigo-500 shrink-0 mt-0.5" />
                   <span><strong>Water Segmentation:</strong> Pixel-level classification of stagnant pools, turbidity, and algae.</span>
@@ -669,29 +669,29 @@ export const TechnicalArchitecture: React.FC = () => {
             </div>
 
             {/* Stage 4: Predictive Risk Engine */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-xs">
                   4
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-xs">Decision Support</h3>
+                <h3 className="font-bold text-slate-900 text-xs">Decision Support</h3>
               </div>
 
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Prioritizes municipal resources by generating a unified 0–100 Breeding Risk Score, categorizing wards into Critical, High, Moderate, or Low urgency.
               </p>
             </div>
 
             {/* Stage 5: Field Officer Protocol */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xs">
                   5
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-xs">Field Verification Protocol</h3>
+                <h3 className="font-bold text-slate-900 text-xs">Field Verification Protocol</h3>
               </div>
 
-              <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <ul className="space-y-2 text-xs text-slate-600">
                 <li className="flex items-start gap-2">
                   <Smartphone className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                   <span><strong>GPS Anchor:</strong> Live device location validation within 100m geo-fence radius.</span>
@@ -704,15 +704,15 @@ export const TechnicalArchitecture: React.FC = () => {
             </div>
 
             {/* Stage 6: Feedback Calibration Loop */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold text-xs">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">
                   6
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-xs">Feedback Calibration</h3>
+                <h3 className="font-bold text-slate-900 text-xs">Feedback Calibration</h3>
               </div>
 
-              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 Verified field outcomes are retained as feedback data for future model calibration and retraining, continuously improving retention forecasts.
               </p>
             </div>
@@ -726,42 +726,42 @@ export const TechnicalArchitecture: React.FC = () => {
       {/* RECORD INSPECTOR MODAL */}
       {/* ========================================================================= */}
       {inspectTable && activeTableMeta && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-50 vg-scrim flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
+          <div className="bg-card rounded-2xl border border-slate-200 shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
             
             {/* Modal Header */}
-            <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-900/90">
+            <div className="p-4 sm:p-6 border-b border-slate-200 flex items-center justify-between gap-4 bg-slate-50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-sm">
+                <div className="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-sm">
                   <Database className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                      Table Inspector: <span className="font-mono text-sky-600 dark:text-sky-400">{inspectTable}</span>
+                    <h3 className="text-base font-bold text-slate-900">
+                      Table Inspector: <span className="font-mono text-sky-600">{inspectTable}</span>
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-bold text-slate-700 dark:text-slate-300">
+                    <span className="px-2 py-0.5 rounded-full bg-slate-200 text-[10px] font-bold text-slate-700">
                       {rawRows.length} records
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 text-[10px] font-semibold">
+                    <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-semibold">
                       DEMO / PILOT DATA — ILLUSTRATIVE
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Source: {activeTableMeta.primarySource} • Provenance: <strong className="text-slate-700 dark:text-slate-300">{activeTableMeta.sourceTag}</strong>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Source: {activeTableMeta.primarySource} • Provenance: <strong className="text-slate-700">{activeTableMeta.sourceTag}</strong>
                   </p>
                 </div>
               </div>
 
               {/* Controls */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center bg-slate-200 dark:bg-slate-800 p-1 rounded-xl">
+                <div className="flex items-center bg-slate-200 p-1 rounded-xl">
                   <button
                     onClick={() => setViewMode('table')}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                       viewMode === 'table' 
-                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs' 
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-card text-slate-900 shadow-2xs' 
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <TableIcon className="w-3.5 h-3.5" />
@@ -771,8 +771,8 @@ export const TechnicalArchitecture: React.FC = () => {
                     onClick={() => setViewMode('json')}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                       viewMode === 'json' 
-                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs' 
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-card text-slate-900 shadow-2xs' 
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     <Code className="w-3.5 h-3.5" />
@@ -783,7 +783,7 @@ export const TechnicalArchitecture: React.FC = () => {
                 <button
                   onClick={handleExportCsv}
                   title="Export to CSV"
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
                 >
                   <Download className="w-4 h-4" />
                 </button>
@@ -791,14 +791,14 @@ export const TechnicalArchitecture: React.FC = () => {
                 <button
                   onClick={handleCopyJson}
                   title="Copy JSON"
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
                 >
                   {copiedSuccess ? <Check className="w-4 h-4 text-emerald-500" /> : <FileText className="w-4 h-4" />}
                 </button>
 
                 <button
                   onClick={() => setInspectTable(null)}
-                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-100 hover:text-rose-600 dark:hover:bg-rose-950 dark:hover:text-rose-400 text-slate-500 transition-colors"
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-rose-100 hover:text-rose-600 text-slate-500 transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -806,7 +806,7 @@ export const TechnicalArchitecture: React.FC = () => {
             </div>
 
             {/* Filter / Search Bar */}
-            <div className="p-3 sm:px-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 bg-white dark:bg-slate-900">
+            <div className="p-3 sm:px-6 border-b border-slate-200 flex items-center justify-between gap-3 bg-card">
               <div className="relative flex-1 max-w-md">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -814,22 +814,22 @@ export const TechnicalArchitecture: React.FC = () => {
                   placeholder={`Search ${inspectTable} by ID, status, ward, coordinates...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
+                  className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500"
                 />
               </div>
 
-              <div className="text-xs text-slate-500 dark:text-slate-400">
+              <div className="text-xs text-slate-500">
                 Showing {filteredRows.length} of {rawRows.length} records
               </div>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-50 dark:bg-slate-950/40">
+            <div className="flex-1 overflow-auto p-4 sm:p-6 bg-slate-50">
               {viewMode === 'table' ? (
-                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto shadow-2xs">
+                <div className="rounded-xl border border-slate-200 bg-card overflow-x-auto shadow-2xs">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 font-semibold">
+                      <tr className="border-b border-slate-200 bg-slate-100 text-slate-600 font-semibold">
                         {rawRows.length > 0 && Object.keys(rawRows[0]).map((col) => (
                           <th key={col} className="p-3 font-mono text-[11px] whitespace-nowrap">
                             {col}
@@ -837,9 +837,9 @@ export const TechnicalArchitecture: React.FC = () => {
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-mono text-[11px]">
+                    <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
                       {filteredRows.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                        <tr key={idx} className="hover:bg-slate-50 transition-colors">
                           {Object.entries(row).map(([k, val]: [string, any], colIdx) => {
                             // If this is an image_reference column in the evidence table, display an interactive thumbnail
                             if (k === 'image_reference' && typeof val === 'string') {
@@ -850,12 +850,12 @@ export const TechnicalArchitecture: React.FC = () => {
                                     <img 
                                       src={resolvedUrl} 
                                       alt="Evidence preview" 
-                                      className="w-8 h-8 rounded-md object-cover border border-slate-300 dark:border-slate-700 bg-slate-100"
+                                      className="w-8 h-8 rounded-md object-cover border border-slate-300 bg-slate-100"
                                       onError={(e) => {
                                         (e.target as HTMLElement).style.display = 'none';
                                       }}
                                     />
-                                    <span className="text-slate-700 dark:text-slate-300 truncate max-w-[200px]" title={val}>
+                                    <span className="text-slate-700 truncate max-w-[200px]" title={val}>
                                       {val}
                                     </span>
                                   </div>
@@ -865,13 +865,13 @@ export const TechnicalArchitecture: React.FC = () => {
 
                             // If this is a status or risk level column, render styled badge
                             if (k === 'status' || k === 'verification_status' || k === 'risk_level') {
-                              let badgeStyle = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+                              let badgeStyle = 'bg-slate-100 text-slate-700';
                               if (val === 'CRITICAL' || val === 'HIGH' || val === 'REJECTED') {
-                                badgeStyle = 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+                                badgeStyle = 'bg-rose-100 text-rose-800';
                               } else if (val === 'RESOLVED' || val === 'APPROVED') {
-                                badgeStyle = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+                                badgeStyle = 'bg-emerald-100 text-emerald-800';
                               } else if (val === 'IN_PROGRESS' || val === 'ASSIGNED' || val === 'MODERATE') {
-                                badgeStyle = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+                                badgeStyle = 'bg-amber-100 text-amber-800';
                               }
                               return (
                                 <td key={colIdx} className="p-3 whitespace-nowrap">
@@ -883,7 +883,7 @@ export const TechnicalArchitecture: React.FC = () => {
                             }
 
                             return (
-                              <td key={colIdx} className="p-3 text-slate-700 dark:text-slate-300 whitespace-nowrap max-w-[280px] truncate" title={typeof val === 'object' ? JSON.stringify(val) : String(val ?? '')}>
+                              <td key={colIdx} className="p-3 text-slate-700 whitespace-nowrap max-w-[280px] truncate" title={typeof val === 'object' ? JSON.stringify(val) : String(val ?? '')}>
                                 {typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val ?? '—')}
                               </td>
                             );
@@ -894,18 +894,18 @@ export const TechnicalArchitecture: React.FC = () => {
                   </table>
                 </div>
               ) : (
-                <pre className="p-4 rounded-xl bg-slate-900 text-sky-300 font-mono text-xs overflow-auto max-h-[58vh] border border-slate-800 leading-relaxed">
+                <pre className="vg-island p-4 rounded-xl bg-slate-900 text-sky-300 font-mono text-xs overflow-auto max-h-[58vh] border border-slate-800 leading-relaxed">
                   {JSON.stringify(filteredRows, null, 2)}
                 </pre>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3.5 sm:px-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between text-xs text-slate-500">
-              <span>Primary Key: <code className="text-sky-600 dark:text-sky-400 font-bold">{activeTableMeta.primaryKey}</code></span>
+            <div className="p-3.5 sm:px-6 border-t border-slate-200 bg-card flex items-center justify-between text-xs text-slate-500">
+              <span>Primary Key: <code className="text-sky-600 font-bold">{activeTableMeta.primaryKey}</code></span>
               <button
                 onClick={() => setInspectTable(null)}
-                className="px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs"
+                className="px-4 py-1.5 rounded-xl vg-btn-primary font-semibold text-xs"
               >
                 Close Inspector
               </button>

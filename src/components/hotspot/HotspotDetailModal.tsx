@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { 
   X, 
   ShieldAlert, 
@@ -23,6 +23,9 @@ import {
   Info
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { RiskScoreTile } from '../common/RiskBadge';
+import { riskStyle } from '../../utils/riskStyles';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { calculateRisk } from '../../data/seedHotspots';
 import { RealisticVisualEvidence } from '../verification/RealisticVisualEvidence';
 import { DownloadReportButton } from '../common/DownloadReportButton';
@@ -45,6 +48,9 @@ export const HotspotDetailModal: React.FC = () => {
   const [simEnv, setSimEnv] = useState<number>(75);
   const [simHist, setSimHist] = useState<number>(70);
 
+  const closeModal = useCallback(() => setSelectedHotspotId(null), [setSelectedHotspotId]);
+  useEscapeKey(!!selectedHotspotId, closeModal);
+
   if (!selectedHotspotId) return null;
 
   const hotspot = hotspots.find(h => h.hotspot_id === selectedHotspotId);
@@ -56,33 +62,24 @@ export const HotspotDetailModal: React.FC = () => {
   const simResult = calculateRisk(simVisual, simRetention, simEnv, simHist);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto vg-scrim flex items-center justify-center p-3 sm:p-4" onClick={closeModal}>
       <div 
-        className="bg-white w-full max-w-3xl rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
+        role="dialog"
+        aria-modal="true"
+        className="bg-surface animate-pop-in w-full max-w-3xl rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Modal Header */}
-        <div className="bg-slate-900 text-white p-4 sm:p-5 border-b border-slate-800 flex items-start justify-between">
+        <div className="vg-hero !rounded-none !shadow-none p-4 sm:p-5 flex items-start justify-between">
           <div className="flex items-start gap-3.5">
-            <div className={`w-11 h-11 rounded-lg flex items-center justify-center font-bold text-base text-white shrink-0 ${
-              hotspot.risk_level === 'CRITICAL' ? 'bg-purple-600' :
-              hotspot.risk_level === 'HIGH' ? 'bg-rose-500' :
-              hotspot.risk_level === 'MODERATE' ? 'bg-amber-500' :
-              'bg-emerald-600'
-            }`}>
-              {hotspot.breeding_risk_score}
-            </div>
+            <RiskScoreTile level={hotspot.risk_level} score={hotspot.breeding_risk_score} className="w-11 h-11 text-base" />
             
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-base font-bold text-white tracking-tight">{hotspot.hotspot_id}</h3>
-                <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${
-                  hotspot.risk_level === 'CRITICAL' ? 'bg-purple-950 text-purple-200 border border-purple-700' :
-                  hotspot.risk_level === 'HIGH' ? 'bg-rose-950 text-rose-200 border border-rose-700' :
-                  hotspot.risk_level === 'MODERATE' ? 'bg-amber-950 text-amber-200 border border-amber-700' :
-                  'bg-emerald-950 text-emerald-200 border border-emerald-700'
-                }`}>
+                <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase px-2 py-0.5 rounded text-white ${riskStyle(hotspot.risk_level).tint}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${riskStyle(hotspot.risk_level).fill}`} aria-hidden="true" />
                   {hotspot.risk_level} RISK
                 </span>
                 
@@ -262,7 +259,7 @@ export const HotspotDetailModal: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 
                 {/* Meteorological & Physical Profile */}
-                <div className="border border-slate-200 rounded-lg p-3.5 space-y-2 bg-white">
+                <div className="border border-slate-200 rounded-lg p-3.5 space-y-2 bg-card">
                   <h5 className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
                     <CloudRain className="w-3.5 h-3.5 text-sky-600" />
                     <span>Environmental Observations</span>
@@ -297,7 +294,7 @@ export const HotspotDetailModal: React.FC = () => {
                 </div>
 
                 {/* Surveillance & Recommended Protocol */}
-                <div className="border border-slate-200 rounded-lg p-3.5 space-y-2.5 bg-white">
+                <div className="border border-slate-200 rounded-lg p-3.5 space-y-2.5 bg-card">
                   <h5 className="font-semibold text-slate-900 text-xs flex items-center gap-1.5">
                     <Eye className="w-3.5 h-3.5 text-indigo-600" />
                     <span>Protocol Recommendation</span>
@@ -458,7 +455,7 @@ export const HotspotDetailModal: React.FC = () => {
             <button
               id="modal-close-bottom-btn"
               onClick={() => setSelectedHotspotId(null)}
-              className="px-3 py-1.5 rounded-md text-xs font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 transition"
+              className="px-3 py-1.5 rounded-md text-xs font-medium text-slate-700 bg-card border border-slate-300 hover:bg-slate-100 transition"
             >
               Close
             </button>

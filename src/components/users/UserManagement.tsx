@@ -1,7 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Users, Shield, Smartphone, Building2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../types';
+
+const AVATAR_TILE: Record<UserRole, string> = {
+  ADMIN: 'from-[#1452f0] to-[#22c8f5]',
+  FIELD_OFFICER: 'from-emerald-500 to-teal-400',
+  CITIZEN: 'from-violet-500 to-fuchsia-400',
+};
+
+/** Remote photo with an initials fallback when the image can't load. */
+const UserAvatar: React.FC<{ src: string; name: string; role: UserRole }> = ({ src, name, role }) => {
+  const [failed, setFailed] = useState(false);
+  const initials = name
+    .replace(/\(.*?\)/g, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0]?.toUpperCase())
+    .join('');
+
+  if (failed || !src) {
+    return (
+      <div
+        className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_TILE[role]} text-white text-sm font-bold grid place-items-center ring-2 ring-slate-200 shrink-0`}
+        aria-label={name}
+      >
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      onError={() => setFailed(true)}
+      className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-200 shrink-0"
+    />
+  );
+};
 
 export const UserManagement: React.FC = () => {
   const { switchUserRole, currentUser } = useApp();
@@ -43,7 +81,7 @@ export const UserManagement: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
       
       {/* Header */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex items-center justify-between">
+      <div className="vg-hero rounded-2xl p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center ring-1 ring-blue-500/30">
             <Users className="w-6 h-6" />
@@ -65,16 +103,12 @@ export const UserManagement: React.FC = () => {
           return (
             <div 
               key={user.id}
-              className={`bg-white rounded-2xl p-5 border transition shadow-xs flex flex-col justify-between space-y-4 ${
+              className={`bg-card rounded-2xl p-5 border transition shadow-xs flex flex-col justify-between space-y-4 ${
                 isCurrent ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-200'
               }`}
             >
               <div className="flex items-start gap-3.5">
-                <img 
-                  src={user.avatar} 
-                  alt={user.name} 
-                  className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-200 shrink-0"
-                />
+                <UserAvatar src={user.avatar} name={user.name} role={user.role} />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-sm text-slate-900">{user.name}</h3>

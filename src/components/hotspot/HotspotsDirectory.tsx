@@ -21,6 +21,8 @@ import {
   Info
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { RiskBadge, RiskScoreTile } from '../common/RiskBadge';
+import { riskStyle } from '../../utils/riskStyles';
 import { HotspotRecord, RiskLevel, HotspotStatus } from '../../types';
 import { DEMO_EVIDENCE_IMAGES } from '../../data/evidenceImages';
 import { DownloadReportButton } from '../common/DownloadReportButton';
@@ -84,7 +86,7 @@ export const HotspotsDirectory: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-[1560px] mx-auto space-y-5">
       
       {/* Header & Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600" />
@@ -95,13 +97,13 @@ export const HotspotsDirectory: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
             <button
               id="tab-directory-list"
               onClick={() => setActiveTab('DIRECTORY')}
-              className={`px-3 py-1.5 rounded-lg transition ${
-                activeTab === 'DIRECTORY' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
+                activeTab === 'DIRECTORY' ? 'bg-card text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Surveillance Directory
@@ -109,7 +111,7 @@ export const HotspotsDirectory: React.FC = () => {
             <button
               id="tab-surveillance-evidence"
               onClick={() => setActiveTab('SURVEILLANCE_EVIDENCE')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
                 activeTab === 'SURVEILLANCE_EVIDENCE' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -128,7 +130,7 @@ export const HotspotsDirectory: React.FC = () => {
               downloadAnchor.click();
               downloadAnchor.remove();
             }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap bg-card border border-slate-300 text-slate-700 hover:bg-slate-50 transition"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export JSON</span>
@@ -141,7 +143,7 @@ export const HotspotsDirectory: React.FC = () => {
         <div className="space-y-4">
           
           {/* Top Context Alert */}
-          <div className="bg-slate-900 text-white rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="vg-hero rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center ring-1 ring-indigo-500/30 shrink-0">
                 <Plane className="w-6 h-6" />
@@ -190,7 +192,7 @@ export const HotspotsDirectory: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             
             {/* Left: High-Resolution Viewport (7 cols) */}
-            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+            <div className="lg:col-span-7 bg-card rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Camera className="w-4 h-4 text-slate-500" />
@@ -202,7 +204,7 @@ export const HotspotsDirectory: React.FC = () => {
               </div>
 
               {/* Drone Viewport Container */}
-              <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 aspect-4/3 flex items-center justify-center">
+              <div className="vg-island relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 aspect-4/3 flex items-center justify-center">
                 <img 
                   src={DEMO_EVIDENCE_IMAGES.vg1042_before} 
                   alt="Targeted Drone Aerial Capture"
@@ -248,7 +250,7 @@ export const HotspotsDirectory: React.FC = () => {
             <div className="lg:col-span-5 space-y-4">
               
               {/* CV Detection Card */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+              <div className="bg-card rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                     <Cpu className="w-4 h-4 text-cyan-600" />
@@ -288,7 +290,7 @@ export const HotspotsDirectory: React.FC = () => {
               </div>
 
               {/* Recommended Preventive Actions Card */}
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
+              <div className="bg-card rounded-2xl border border-slate-200 p-4 shadow-xs space-y-3">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -337,7 +339,7 @@ export const HotspotsDirectory: React.FC = () => {
                       setActiveView('TASKS');
                       if (demoStep < 12) setDemoStep(12);
                     }}
-                    className="px-3 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition"
+                    className="px-3 py-2 rounded-xl text-xs font-bold vg-btn-primary transition"
                   >
                     Dispatch Task
                   </button>
@@ -353,7 +355,7 @@ export const HotspotsDirectory: React.FC = () => {
         /* DIRECTORY TABLE VIEW */
         <>
           {/* Filter Controls Bar */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+          <div className="bg-card rounded-2xl border border-slate-200 p-4 shadow-xs">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               
               {/* Search */}
@@ -420,7 +422,7 @@ export const HotspotsDirectory: React.FC = () => {
           </div>
 
           {/* Directory Content: Desktop Table & Mobile Cards */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-card rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             
             {/* Desktop Table View */}
             <div className="hidden md:block overflow-x-auto">
@@ -467,22 +469,10 @@ export const HotspotsDirectory: React.FC = () => {
                         {/* Risk Score */}
                         <td className="p-3.5">
                           <div className="flex items-center gap-2">
-                            <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-extrabold text-white text-xs ${
-                              hotspot.risk_level === 'CRITICAL' ? 'bg-purple-600' :
-                              hotspot.risk_level === 'HIGH' ? 'bg-red-500' :
-                              hotspot.risk_level === 'MODERATE' ? 'bg-orange-500' :
-                              'bg-emerald-500'
-                            }`}>
-                              {hotspot.breeding_risk_score}
-                            </span>
+                            <RiskScoreTile level={hotspot.risk_level} score={hotspot.breeding_risk_score} className="w-8 h-8 text-xs" />
                             <div>
-                              <div className={`text-[10px] font-black uppercase ${
-                                hotspot.risk_level === 'CRITICAL' ? 'text-purple-700' :
-                                hotspot.risk_level === 'HIGH' ? 'text-red-700' :
-                                hotspot.risk_level === 'MODERATE' ? 'text-orange-700' :
-                                'text-emerald-700'
-                              }`}>
-                                {hotspot.risk_level}
+                              <div className="text-[10px] font-black uppercase text-slate-800">
+                                {riskStyle(hotspot.risk_level).label}
                               </div>
                               <div className="text-[10px] text-slate-400 font-mono">
                                 Retention: {hotspot.water_retention_prediction}%
@@ -557,17 +547,10 @@ export const HotspotsDirectory: React.FC = () => {
                 const isHero = hotspot.hotspot_id === 'VG-1042';
 
                 return (
-                  <div key={hotspot.hotspot_id} className={`p-4 space-y-3 ${isHero ? 'bg-amber-50/40' : 'bg-white'}`}>
+                  <div key={hotspot.hotspot_id} className={`p-4 space-y-3 ${isHero ? 'bg-amber-50/40' : 'bg-card'}`}>
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className={`w-9 h-9 rounded-lg flex items-center justify-center font-extrabold text-white text-xs shrink-0 ${
-                          hotspot.risk_level === 'CRITICAL' ? 'bg-purple-600' :
-                          hotspot.risk_level === 'HIGH' ? 'bg-red-500' :
-                          hotspot.risk_level === 'MODERATE' ? 'bg-orange-500' :
-                          'bg-emerald-500'
-                        }`}>
-                          {hotspot.breeding_risk_score}
-                        </span>
+                        <RiskScoreTile level={hotspot.risk_level} score={hotspot.breeding_risk_score} />
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono font-extrabold text-slate-900 text-xs">{hotspot.hotspot_id}</span>
@@ -576,14 +559,7 @@ export const HotspotsDirectory: React.FC = () => {
                                 HERO
                               </span>
                             )}
-                            <span className={`text-[9px] font-black uppercase px-1.5 py-0.2 rounded ${
-                              hotspot.risk_level === 'CRITICAL' ? 'bg-purple-100 text-purple-700' :
-                              hotspot.risk_level === 'HIGH' ? 'bg-red-100 text-red-700' :
-                              hotspot.risk_level === 'MODERATE' ? 'bg-orange-100 text-orange-700' :
-                              'bg-emerald-100 text-emerald-700'
-                            }`}>
-                              {hotspot.risk_level}
-                            </span>
+                            <RiskBadge level={hotspot.risk_level} />
                           </div>
                           <div className="text-[10px] text-slate-400 font-mono">{hotspot.site_type}</div>
                         </div>

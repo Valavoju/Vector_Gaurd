@@ -123,7 +123,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
     <div className="w-full max-w-2xl mx-auto py-6 px-4 sm:px-6">
       
       {/* Registration Card */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">
+      <div className="bg-card rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">
         
         {/* Header Title & Subtitle */}
         <div className="space-y-1.5 pb-5 border-b border-slate-100">
@@ -188,7 +188,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
                     if (errors.fullName) setErrors(prev => ({ ...prev, fullName: '' }));
                   }}
                   placeholder="e.g. Anil Kumar"
-                  className={`w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 ${
+                  className={`w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-card focus:ring-2 ${
                     errors.fullName ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/20' : 'border-slate-200 focus:ring-violet-500/20 focus:border-violet-500'
                   }`}
                 />
@@ -217,7 +217,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
                   }}
                   placeholder="e.g. 9876543210"
                   maxLength={13}
-                  className={`w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 ${
+                  className={`w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-card focus:ring-2 ${
                     errors.mobileNumber ? 'border-rose-400 focus:ring-rose-200 bg-rose-50/20' : 'border-slate-200 focus:ring-violet-500/20 focus:border-violet-500'
                   }`}
                 />
@@ -250,7 +250,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
                   if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
                 }}
                 placeholder="e.g. anil.kumar@example.in"
-                className={`w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 ${
+                className={`w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-card focus:ring-2 ${
                   errors.email ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-violet-500/20 focus:border-violet-500'
                 }`}
               />
@@ -276,7 +276,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
                 <select
                   value={state}
                   onChange={(e) => handleStateChange(e.target.value)}
-                  className="w-full pl-9 pr-8 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 appearance-none cursor-pointer"
+                  className="w-full pl-9 pr-8 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 appearance-none cursor-pointer"
                 >
                   <option value="">Select State</option>
                   {ALL_INDIAN_STATES_AND_UTS.map(s => (
@@ -306,7 +306,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
                       setCity(e.target.value);
                       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
                     }}
-                    className="w-full pl-9 pr-8 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 appearance-none cursor-pointer"
+                    className="w-full pl-9 pr-8 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 appearance-none cursor-pointer"
                   >
                     <option value="">Select City</option>
                     {cityList.map(c => (
@@ -322,7 +322,7 @@ export const CitizenRegistration: React.FC<CitizenRegistrationProps> = ({ onRegi
                       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
                     }}
                     placeholder="Enter city name"
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50/60 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
                   />
                 )}
               </div>

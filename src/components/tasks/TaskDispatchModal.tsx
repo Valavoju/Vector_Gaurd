@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { 
   X, 
   Send, 
@@ -12,6 +12,8 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { RiskBadge } from '../common/RiskBadge';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 export const TaskDispatchModal: React.FC = () => {
   const { 
@@ -38,6 +40,9 @@ export const TaskDispatchModal: React.FC = () => {
     }
   }, [hotspot]);
 
+  const closeModal = useCallback(() => setDispatchModalHotspotId(null), [setDispatchModalHotspotId]);
+  useEscapeKey(!!dispatchModalHotspotId, closeModal);
+
   if (!dispatchModalHotspotId || !hotspot) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -54,14 +59,16 @@ export const TaskDispatchModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 overflow-y-auto vg-scrim flex items-center justify-center p-3 sm:p-4" onClick={closeModal}>
       <div 
-        className="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+        role="dialog"
+        aria-modal="true"
+        className="bg-surface animate-pop-in w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Header */}
-        <div className="bg-slate-900 text-white p-5 border-b border-slate-800 flex items-start justify-between">
+        <div className="vg-hero !rounded-none !shadow-none p-5 flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md">
               <Send className="w-5 h-5" />
@@ -91,11 +98,7 @@ export const TaskDispatchModal: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-sm text-slate-900">{hotspot.hotspot_id}</span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                  hotspot.risk_level === 'CRITICAL' ? 'bg-purple-100 text-purple-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {hotspot.risk_level} (Score: {hotspot.breeding_risk_score})
-                </span>
+                <RiskBadge level={hotspot.risk_level} suffix={`Score ${hotspot.breeding_risk_score}`} />
               </div>
               <div className="text-[11px] text-slate-600 mt-0.5">{hotspot.location} • {hotspot.ward}</div>
             </div>
@@ -207,7 +210,7 @@ export const TaskDispatchModal: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setDispatchModalHotspotId(null)}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 transition"
+                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-700 bg-card border border-slate-300 hover:bg-slate-100 transition"
               >
                 Cancel
               </button>

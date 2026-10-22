@@ -33,11 +33,11 @@ export const CitizenPortal: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[calc(100vh-68px)] bg-slate-100/60 pb-12">
+    <div className="w-full min-h-full pb-12">
       
       {/* Top Banner Navigation Bar for Citizen */}
-      <div className="bg-white border-b border-slate-200/90 sticky top-[68px] z-30 shadow-2xs">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      <div className="sticky top-0 z-30 px-3 sm:px-6 pt-3 sm:pt-6">
+        <div className="max-w-5xl mx-auto vg-glass rounded-2xl px-3 sm:px-4 h-14 flex items-center justify-between gap-4">
           
           {/* Left: Persona Identification */}
           <div className="flex items-center gap-2.5">
@@ -68,7 +68,7 @@ export const CitizenPortal: React.FC = () => {
                 onClick={() => setActiveTab('SUBMIT')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
                   activeTab === 'SUBMIT' 
-                    ? 'bg-white text-violet-700 shadow-xs' 
+                    ? 'bg-card text-violet-700 shadow-xs' 
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -80,7 +80,7 @@ export const CitizenPortal: React.FC = () => {
                 onClick={() => setActiveTab('STATUS')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                   activeTab === 'STATUS' 
-                    ? 'bg-white text-violet-700 shadow-xs' 
+                    ? 'bg-card text-violet-700 shadow-xs' 
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >

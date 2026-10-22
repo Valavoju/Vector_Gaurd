@@ -18,6 +18,18 @@ export default defineConfig(() => {
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
+    build: {
+      rollupOptions: {
+        output: {
+          // Long-lived vendor chunks so app deploys don't invalidate them.
+          manualChunks: {
+            react: ['react', 'react-dom'],
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+            leaflet: ['leaflet'],
+          },
+        },
+      },
+    },
     preview: {
       host: '0.0.0.0',
       port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,

@@ -120,7 +120,7 @@ export const VerificationCenter: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-[1560px] mx-auto space-y-5">
       
       {/* Header Banner */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="vg-hero rounded-2xl p-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center ring-1 ring-indigo-500/30">
             <CheckSquare className="w-6 h-6" />
@@ -190,7 +190,7 @@ export const VerificationCenter: React.FC = () => {
       {activeTab === 'PENDING' && (
         <>
           {pendingTasks.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
+            <div className="bg-card rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
               <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
@@ -225,7 +225,7 @@ export const VerificationCenter: React.FC = () => {
                     <div
                       key={task.task_id}
                       onClick={() => setSelectedTaskId(task.task_id)}
-                      className={`bg-white rounded-xl p-4 border cursor-pointer transition-all ${
+                      className={`bg-card rounded-xl p-4 border cursor-pointer transition-all ${
                         isSelected 
                           ? 'border-indigo-600 ring-2 ring-indigo-500/20 shadow-md' 
                           : 'border-slate-200 hover:border-slate-300 shadow-xs'
@@ -254,7 +254,7 @@ export const VerificationCenter: React.FC = () => {
 
               {/* Right Column: Deep Comparison & Audit Panel */}
               {activeTask && (
-                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+                <div className="lg:col-span-8 bg-card rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
                   
                   {/* Task Summary Banner */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
@@ -302,10 +302,11 @@ export const VerificationCenter: React.FC = () => {
                     task={activeTask}
                     showAdditionalAngles={true}
                     showMetadataCards={false}
+                    showReportButton={false}
                   />
 
                   {/* GPS GEO-VERIFICATION & EXIF AUDIT PANEL */}
-                  <div className="bg-slate-900 text-white rounded-xl p-4 border border-slate-800 space-y-3">
+                  <div className="vg-panel-dark rounded-xl p-4 space-y-3">
                     <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-800 pb-2.5">
                       <div className="flex items-center gap-2">
                         <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
@@ -446,7 +447,7 @@ export const VerificationCenter: React.FC = () => {
                       type="text" 
                       value={adminNotes} 
                       onChange={(e) => setAdminNotes(e.target.value)}
-                      className="w-full bg-white border border-indigo-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full bg-card border border-indigo-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
 
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
@@ -497,7 +498,7 @@ export const VerificationCenter: React.FC = () => {
               </div>
             </div>
 
-            <div className="lg:col-span-6 bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4.5 flex items-start gap-3">
+            <div className="lg:col-span-6 vg-panel-dark rounded-2xl p-4.5 flex items-start gap-3">
               <Info className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
               <div>
                 <div className="text-xs font-extrabold text-amber-400 uppercase tracking-wide">
@@ -512,7 +513,7 @@ export const VerificationCenter: React.FC = () => {
           </div>
 
           {citizenSubmissions.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
+            <div className="bg-card rounded-2xl border border-dashed border-slate-300 p-12 text-center space-y-3">
               <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center mx-auto text-violet-600">
                 <UploadCloud className="w-6 h-6" />
               </div>
@@ -538,7 +539,7 @@ export const VerificationCenter: React.FC = () => {
                     <div
                       key={submission.submissionId}
                       onClick={() => setSelectedCitizenId(submission.submissionId)}
-                      className={`bg-white rounded-xl p-4 border cursor-pointer transition-all ${
+                      className={`bg-card rounded-xl p-4 border cursor-pointer transition-all ${
                         isSelected 
                           ? 'border-violet-600 ring-2 ring-violet-500/20 shadow-md' 
                           : 'border-slate-200 hover:border-slate-300 shadow-xs'
@@ -573,7 +574,7 @@ export const VerificationCenter: React.FC = () => {
 
               {/* Right Column: Citizen Evidence Review Panel */}
               {activeCitizenSubmission && (
-                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
+                <div className="lg:col-span-8 bg-card rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6">
                   
                   {/* Header Banner */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
@@ -626,15 +627,15 @@ export const VerificationCenter: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-card p-2.5 rounded-lg border border-slate-200">
                         <div className="text-[10px] text-slate-400 font-bold">CITIZEN IDENTITY</div>
                         <div className="font-mono font-bold text-slate-900 mt-0.5">{activeCitizenSubmission.citizenNameMasked}</div>
                       </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-card p-2.5 rounded-lg border border-slate-200">
                         <div className="text-[10px] text-slate-400 font-bold">MOBILE (MASKED)</div>
                         <div className="font-mono font-bold text-slate-900 mt-0.5">{activeCitizenSubmission.citizenMobileMasked}</div>
                       </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-card p-2.5 rounded-lg border border-slate-200">
                         <div className="text-[10px] text-slate-400 font-bold">EMAIL (MASKED)</div>
                         <div className="font-mono font-bold text-slate-900 mt-0.5 truncate">
                           {activeCitizenSubmission.citizenEmailMasked || 'N/A'}
@@ -656,7 +657,7 @@ export const VerificationCenter: React.FC = () => {
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
                         />
-                        <span className="absolute top-2 left-2 bg-slate-950/80 text-white font-mono text-[9px] px-2 py-0.5 rounded backdrop-blur-xs">
+                        <span className="vg-island absolute top-2 left-2 bg-slate-950/80 text-white font-mono text-[9px] px-2 py-0.5 rounded backdrop-blur-xs">
                           {activeCitizenSubmission.evidenceType}
                         </span>
                         {activeCitizenSubmission.isDroneRestrictedScenario && (
@@ -716,7 +717,7 @@ export const VerificationCenter: React.FC = () => {
                       type="text" 
                       value={citizenAdminNotes} 
                       onChange={(e) => setCitizenAdminNotes(e.target.value)}
-                      className="w-full bg-white border border-violet-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      className="w-full bg-card border border-violet-200 rounded-lg p-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
                     />
 
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
@@ -751,8 +752,8 @@ export const VerificationCenter: React.FC = () => {
 
       {/* RE-INSPECTION MODAL */}
       {showReinspectModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 vg-scrim flex items-center justify-center p-4">
+          <div className="bg-card rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 className="text-sm font-bold text-slate-900">Request Re-Inspection</h3>
             <p className="text-xs text-slate-600">
               Provide specific feedback to Field Officer {activeTask?.assigned_officer} regarding why additional remediation is needed.
@@ -790,7 +791,7 @@ export const VerificationCenter: React.FC = () => {
 
       {/* RESOLVED ARCHIVE TAB */}
       {activeTab === 'RESOLVED_LOG' && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
+        <div className="bg-card rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
           <h3 className="text-sm font-bold text-slate-900">Verified & Resolved Mitigation Archive</h3>
           
           <div className="space-y-3">

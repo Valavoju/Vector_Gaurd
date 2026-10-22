@@ -15,7 +15,7 @@ export const ResponsibleAIModal: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
       
       {/* Header */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex items-center justify-between">
+      <div className="vg-hero rounded-2xl p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center ring-1 ring-amber-500/30">
             <ShieldAlert className="w-6 h-6" />
@@ -33,7 +33,7 @@ export const ResponsibleAIModal: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Boundary 1: Privacy & Civil Liberties */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
+        <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
           <div className="flex items-center gap-2 text-indigo-700 font-bold text-xs">
             <EyeOff className="w-4 h-4" />
             <span>Strict Privacy & Anonymization Standards</span>
@@ -60,7 +60,7 @@ export const ResponsibleAIModal: React.FC = () => {
         </div>
 
         {/* Boundary 2: Decision Support vs Medical Diagnosis */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
+        <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
           <div className="flex items-center gap-2 text-amber-700 font-bold text-xs">
             <Scale className="w-4 h-4" />
             <span>Decision Support — Not Medical Diagnosis</span>
@@ -87,7 +87,7 @@ export const ResponsibleAIModal: React.FC = () => {
         </div>
 
         {/* Boundary 3: Environmental Sustainability */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
+        <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
           <div className="flex items-center gap-2 text-emerald-700 font-bold text-xs">
             <Leaf className="w-4 h-4" />
             <span>Ecological & Chemical Stewardship</span>
@@ -110,7 +110,7 @@ export const ResponsibleAIModal: React.FC = () => {
         </div>
 
         {/* Boundary 4: Bias & Equity in Municipal Resource Dispatch */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
+        <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs space-y-3">
           <div className="flex items-center gap-2 text-purple-700 font-bold text-xs">
             <HeartHandshake className="w-4 h-4" />
             <span>Equitable Public-Health Coverage</span>

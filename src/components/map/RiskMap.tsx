@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import L from 'leaflet';
+import { useTheme } from '../../context/ThemeContext';
+import { riskStyle } from '../../utils/riskStyles';
 import { 
   Search, 
   MapPin, 
@@ -107,7 +109,10 @@ export const RiskMap: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Map Controls State
-  const [basemapStyle, setBasemapStyle] = useState<BasemapStyle>('TERRAIN');
+  const { theme } = useTheme();
+  // Start on the basemap that matches the app theme; an explicit pick sticks.
+  const [basemapStyle, setBasemapStyle] = useState<BasemapStyle>(() => (theme === 'dark' ? 'DARK' : 'TERRAIN'));
+  const basemapPickedRef = useRef(false);
   const [isStarred, setIsStarred] = useState<boolean>(false);
   const [rightTab, setRightTab] = useState<RightPanelTab>('OVERVIEW');
   const [isLegendExpanded, setIsLegendExpanded] = useState<boolean>(true);
@@ -381,6 +386,13 @@ export const RiskMap: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (basemapPickedRef.current) return;
+    const themed: BasemapStyle = theme === 'dark' ? 'DARK' : 'TERRAIN';
+    if (themed !== basemapStyle) handleBasemapChange(themed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme]);
+
   // 1. Initialize Map Instance (National View Framing by default)
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
@@ -429,10 +441,8 @@ export const RiskMap: React.FC = () => {
       }
 
       // Exact color encoding for all 4 risk levels
-      let pinColor = '#22c55e'; // LOW = 0–30 → GREEN GPS PIN
-      if (level === 'CRITICAL') pinColor = '#ef4444'; // CRITICAL = 81–100 → RED GPS PIN
-      else if (level === 'HIGH') pinColor = '#f97316'; // HIGH = 61–80 → ORANGE GPS PIN
-      else if (level === 'MODERATE') pinColor = '#eab308'; // MODERATE = 31–60 → AMBER/YELLOW GPS PIN
+      // Shared severity scale (utils/riskStyles) so pins match every other view.
+      const pinColor = riskStyle(level).hex;
 
       const iconHtml = `
         <div class="relative cursor-pointer transition-transform duration-200 ${isSelected ? 'scale-125 z-50' : 'hover:scale-110 z-10'}">
@@ -474,12 +484,12 @@ export const RiskMap: React.FC = () => {
   }, [filteredHotspots, currentHotspotId, setSelectedHotspotId, setSelectedDetailHotspotId]);
 
   return (
-    <div className="w-full h-[calc(100vh-56px)] bg-[#f8fafc] text-slate-800 flex flex-col overflow-hidden relative select-none">
+    <div className="w-full h-full min-h-[560px] text-slate-800 flex flex-col overflow-hidden relative select-none">
       
       {/* ========================================================================= */}
       {/* TOP SEARCH & FILTER BAR (Desktop Row + Mobile Stacked Layout) */}
       {/* ========================================================================= */}
-      <div className="w-full bg-white border-b border-slate-200 px-3 sm:px-4 py-2.5 z-20 shrink-0 shadow-2xs">
+      <div className="w-full bg-card border-b border-slate-200 px-3 sm:px-4 py-2.5 z-20 shrink-0 shadow-2xs">
         
         {/* DESKTOP FILTER BAR (lg and above: exact approved layout) */}
         <div className="hidden lg:flex items-center justify-between gap-3">
@@ -494,7 +504,7 @@ export const RiskMap: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search city, state, hotspot ID..."
-                className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-sans shadow-2xs"
+                className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-card border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-sans shadow-2xs"
               />
             </div>
 
@@ -506,7 +516,7 @@ export const RiskMap: React.FC = () => {
                 if (val === 'ALL') handleZoomIndia();
                 else handleZoomState(val);
               }}
-              className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-card border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
             >
               <option value="ALL">All States & UTs</option>
               {ALL_INDIAN_STATES_AND_UTS.map(s => (
@@ -526,7 +536,7 @@ export const RiskMap: React.FC = () => {
                   handleZoomCity(val);
                 }
               }}
-              className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-card border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
             >
               <option value="ALL">All Cities</option>
               {availableCitiesForState.map(cityName => (
@@ -538,7 +548,7 @@ export const RiskMap: React.FC = () => {
             <select
               value={selectedRisk}
               onChange={(e) => setSelectedRisk(e.target.value)}
-              className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-card border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
             >
               <option value="ALL">All Risk Levels</option>
               <option value="CRITICAL">Critical (81–100)</option>
@@ -551,7 +561,7 @@ export const RiskMap: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-card border border-slate-200 text-xs text-slate-700 focus:outline-none focus:border-blue-500 shadow-2xs font-medium cursor-pointer"
             >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">Active Stagnation</option>
@@ -569,7 +579,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                 geoLevel === 'INDIA'
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-card text-slate-700 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               India View
@@ -580,7 +590,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                 geoLevel === 'STATE'
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-card text-slate-700 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               State View
@@ -604,7 +614,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
                 geoLevel === 'CITY'
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-card text-slate-700 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               City View
@@ -623,7 +633,7 @@ export const RiskMap: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search city, state, hotspot ID..."
-                className="w-full pl-9 pr-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-2xs"
+                className="w-full pl-9 pr-3 py-2 rounded-lg bg-card border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-2xs"
               />
             </div>
 
@@ -633,7 +643,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition border shrink-0 ${
                 isMobileFiltersExpanded || activeFiltersCount > 0
                   ? 'bg-blue-50 border-blue-300 text-blue-700'
-                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                  : 'bg-card border-slate-200 text-slate-700 hover:bg-slate-50'
               }`}
             >
               <Filter className="w-3.5 h-3.5" />
@@ -653,7 +663,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition shrink-0 ${
                 geoLevel === 'INDIA'
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-card text-slate-700 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               India View
@@ -664,7 +674,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition shrink-0 ${
                 geoLevel === 'STATE'
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-card text-slate-700 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               State View
@@ -688,7 +698,7 @@ export const RiskMap: React.FC = () => {
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition shrink-0 ${
                 geoLevel === 'CITY'
                   ? 'bg-blue-600 text-white shadow-xs'
-                  : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                  : 'bg-card text-slate-700 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               City View
@@ -708,7 +718,7 @@ export const RiskMap: React.FC = () => {
                     if (val === 'ALL') handleZoomIndia();
                     else handleZoomState(val);
                   }}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
+                  className="w-full px-3 py-2 rounded-lg bg-card border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
                 >
                   <option value="ALL">All States & UTs</option>
                   {ALL_INDIAN_STATES_AND_UTS.map(s => (
@@ -731,7 +741,7 @@ export const RiskMap: React.FC = () => {
                       handleZoomCity(val);
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
+                  className="w-full px-3 py-2 rounded-lg bg-card border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
                 >
                   <option value="ALL">All Cities</option>
                   {availableCitiesForState.map(cityName => (
@@ -746,7 +756,7 @@ export const RiskMap: React.FC = () => {
                 <select
                   value={selectedRisk}
                   onChange={(e) => setSelectedRisk(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
+                  className="w-full px-3 py-2 rounded-lg bg-card border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
                 >
                   <option value="ALL">All Risk Levels</option>
                   <option value="CRITICAL">Critical (81–100)</option>
@@ -762,7 +772,7 @@ export const RiskMap: React.FC = () => {
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
+                  className="w-full px-3 py-2 rounded-lg bg-card border border-slate-200 text-xs text-slate-800 shadow-2xs font-medium cursor-pointer"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="ACTIVE">Active Stagnation</option>
@@ -786,14 +796,17 @@ export const RiskMap: React.FC = () => {
         {/* ======================================================================= */}
         {/* CENTER GIS MAP CANVAS */}
         {/* ======================================================================= */}
-        <div className="flex-1 h-full relative overflow-hidden bg-slate-900">
+        <div className="vg-island flex-1 h-full relative overflow-hidden bg-slate-900">
           
           {/* 1. Floating Basemap Selector (Top-Left of Map Canvas) */}
           <div className="absolute top-3 left-3 right-3 sm:right-auto z-10 bg-slate-900/90 text-white p-1 rounded-xl flex items-center gap-1 border border-slate-700/80 shadow-lg backdrop-blur-xs text-xs overflow-x-auto no-scrollbar">
             {(['SATELLITE', 'HYBRID', 'TERRAIN', 'TOPO', 'DARK'] as BasemapStyle[]).map(style => (
               <button
                 key={style}
-                onClick={() => handleBasemapChange(style)}
+                onClick={() => {
+                  basemapPickedRef.current = true;
+                  handleBasemapChange(style);
+                }}
                 className={`px-3 py-1 rounded-lg font-medium text-xs transition capitalize whitespace-nowrap shrink-0 ${
                   basemapStyle === style
                     ? 'bg-blue-600 text-white shadow-xs font-semibold'
@@ -819,7 +832,7 @@ export const RiskMap: React.FC = () => {
               <div className="space-y-1.5 pt-1 text-slate-300 font-sans">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-risk-critical shrink-0"></span>
                     <span>Critical (81–100)</span>
                   </div>
                   <span className="font-bold text-white">{criticalCount}</span>
@@ -827,7 +840,7 @@ export const RiskMap: React.FC = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shrink-0"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-risk-high shrink-0"></span>
                     <span>High (61–80)</span>
                   </div>
                   <span className="font-bold text-white">{highCount}</span>
@@ -835,7 +848,7 @@ export const RiskMap: React.FC = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-risk-moderate shrink-0"></span>
                     <span>Moderate (31–60)</span>
                   </div>
                   <span className="font-bold text-white">{moderateCount}</span>
@@ -843,7 +856,7 @@ export const RiskMap: React.FC = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span className="w-2.5 h-2.5 rounded-full bg-risk-low shrink-0"></span>
                     <span>Low (0–30)</span>
                   </div>
                   <span className="font-bold text-white">{lowCount}</span>
@@ -876,7 +889,7 @@ export const RiskMap: React.FC = () => {
         {/* ======================================================================= */}
         {/* RIGHT HOTSPOT INTELLIGENCE PANEL (Desktop Aside Layout) */}
         {/* ======================================================================= */}
-        <div className="hidden lg:flex w-[400px] xl:w-[420px] bg-white border-l border-slate-200 flex-col justify-between shrink-0 h-full overflow-hidden z-20 shadow-xs text-xs">
+        <div className="hidden lg:flex w-[400px] xl:w-[420px] bg-card border-l border-slate-200 flex-col justify-between shrink-0 h-full overflow-hidden z-20 shadow-xs text-xs">
           
           {/* Scrollable Content Body */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3.5 custom-scrollbar">
@@ -884,10 +897,7 @@ export const RiskMap: React.FC = () => {
             {/* 1. Header: Risk Badge + Hotspot ID + Actions */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider text-white ${
-                  currentHotspot.risk_level === 'CRITICAL' ? 'bg-red-600' :
-                  currentHotspot.risk_level === 'HIGH' ? 'bg-orange-500' : 'bg-amber-500'
-                }`}>
+                <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider ${riskStyle(currentHotspot.risk_level).fill} ${riskStyle(currentHotspot.risk_level).onFill}`}>
                   {currentHotspot.risk_level}
                 </span>
                 <span className="text-xs font-bold text-slate-800 font-mono">
@@ -948,7 +958,7 @@ export const RiskMap: React.FC = () => {
               {/* Drone Thumbnail */}
               <div 
                 onClick={() => setSelectedDetailHotspotId(currentHotspot.hotspot_id)}
-                className="w-36 h-20 rounded-lg overflow-hidden border border-slate-200 relative bg-slate-900 cursor-pointer group shadow-2xs"
+                className="w-36 h-20 rounded-lg overflow-hidden border border-slate-200 vg-island relative bg-slate-900 cursor-pointer group shadow-2xs"
                 title="Click to view full high-resolution evidence"
               >
                 <img 
@@ -1128,7 +1138,7 @@ export const RiskMap: React.FC = () => {
                     className="rounded-xl overflow-hidden border border-slate-200 cursor-pointer group bg-slate-100"
                   >
                     <img src={SVG_VG1042_BEFORE} alt="Aerial Stagnation" className="w-full h-24 object-cover group-hover:scale-105 transition" />
-                    <div className="p-2 text-[10px] bg-white">
+                    <div className="p-2 text-[10px] bg-card">
                       <div className="font-bold text-slate-900">Drone Survey (Before)</div>
                       <div className="text-slate-500">120 sq.m Pit</div>
                     </div>
@@ -1139,7 +1149,7 @@ export const RiskMap: React.FC = () => {
                     className="rounded-xl overflow-hidden border border-slate-200 cursor-pointer group bg-slate-100"
                   >
                     <img src={SVG_VG1042_INTERVENTION} alt="Dewatering Pump Intervention" className="w-full h-24 object-cover group-hover:scale-105 transition" />
-                    <div className="p-2 text-[10px] bg-white">
+                    <div className="p-2 text-[10px] bg-card">
                       <div className="font-bold text-slate-900">Intervention Dewatering</div>
                       <div className="text-slate-500">1200 LPM Pump</div>
                     </div>
@@ -1173,7 +1183,7 @@ export const RiskMap: React.FC = () => {
           </div>
 
           {/* Bottom Action Buttons */}
-          <div className="p-4 border-t border-slate-200 bg-white flex flex-col gap-2.5 shrink-0">
+          <div className="p-4 border-t border-slate-200 bg-card flex flex-col gap-2.5 shrink-0">
             <DownloadReportButton
               hotspot={currentHotspot}
               variant="primary"
@@ -1194,7 +1204,7 @@ export const RiskMap: React.FC = () => {
               <button
                 id="right-panel-view-hotspots-btn"
                 onClick={() => setActiveView('HOTSPOTS')}
-                className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-95"
+                className="w-full py-2.5 px-3 rounded-xl bg-card hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-95"
               >
                 <span>View Hotspots</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1207,15 +1217,12 @@ export const RiskMap: React.FC = () => {
         {/* ======================================================================= */}
         {/* MOBILE BOTTOM FLOATING BAR (Collapsed Summary) */}
         {/* ======================================================================= */}
-        <div className="lg:hidden absolute bottom-3 left-3 right-3 z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-3 flex items-center justify-between gap-2">
+        <div className="lg:hidden absolute bottom-3 left-3 right-3 z-20 bg-card/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-3 flex items-center justify-between gap-2">
           <div 
             className="flex items-center gap-2.5 min-w-0 cursor-pointer flex-1"
             onClick={() => setIsMobilePanelOpen(true)}
           >
-            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase text-white shrink-0 ${
-              currentHotspot.risk_level === 'CRITICAL' ? 'bg-red-600' :
-              currentHotspot.risk_level === 'HIGH' ? 'bg-orange-500' : 'bg-amber-500'
-            }`}>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase shrink-0 ${riskStyle(currentHotspot.risk_level).fill} ${riskStyle(currentHotspot.risk_level).onFill}`}>
               {currentHotspot.risk_level}
             </span>
             <div className="min-w-0">
@@ -1241,12 +1248,12 @@ export const RiskMap: React.FC = () => {
         {/* MOBILE SLIDE-UP BOTTOM SHEET (Expanded) */}
         {/* ======================================================================= */}
         {isMobilePanelOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end vg-scrim animate-in fade-in duration-150">
             <div 
               className="fixed inset-0"
               onClick={() => setIsMobilePanelOpen(false)}
             />
-            <div className="relative bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col overflow-hidden z-10 animate-in slide-in-from-bottom duration-200">
+            <div className="relative bg-card rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col overflow-hidden z-10 animate-in slide-in-from-bottom duration-200">
               <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50 shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-blue-600" />
@@ -1263,10 +1270,7 @@ export const RiskMap: React.FC = () => {
                 {/* 1. Header: Risk Badge + Hotspot ID */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider text-white ${
-                      currentHotspot.risk_level === 'CRITICAL' ? 'bg-red-600' :
-                      currentHotspot.risk_level === 'HIGH' ? 'bg-orange-500' : 'bg-amber-500'
-                    }`}>
+                    <span className={`px-2.5 py-0.5 rounded-md text-[11px] font-extrabold uppercase tracking-wider ${riskStyle(currentHotspot.risk_level).fill} ${riskStyle(currentHotspot.risk_level).onFill}`}>
                       {currentHotspot.risk_level}
                     </span>
                     <span className="text-xs font-bold text-slate-800 font-mono">
@@ -1319,7 +1323,7 @@ export const RiskMap: React.FC = () => {
                     setSelectedDetailHotspotId(currentHotspot.hotspot_id);
                     setIsMobilePanelOpen(false);
                   }}
-                  className="rounded-xl overflow-hidden border border-slate-200 bg-slate-900 cursor-pointer relative h-28 group"
+                  className="rounded-xl overflow-hidden border border-slate-200 vg-island bg-slate-900 cursor-pointer relative h-28 group"
                 >
                   <img src={SVG_VG1042_BEFORE} alt="Drone Evidence" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-between p-2 text-white font-medium text-xs">
@@ -1330,7 +1334,7 @@ export const RiskMap: React.FC = () => {
               </div>
 
               {/* Bottom Actions for Mobile */}
-              <div className="p-4 border-t border-slate-200 bg-white grid grid-cols-2 gap-3 shrink-0">
+              <div className="p-4 border-t border-slate-200 bg-card grid grid-cols-2 gap-3 shrink-0">
                 <button
                   id="mobile-sheet-dispatch-task-btn"
                   onClick={() => {
@@ -1349,7 +1353,7 @@ export const RiskMap: React.FC = () => {
                     setActiveView('HOTSPOTS');
                     setIsMobilePanelOpen(false);
                   }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-95"
+                  className="w-full py-2.5 px-3 rounded-xl bg-card hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-95"
                 >
                   <span>All Hotspots</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />

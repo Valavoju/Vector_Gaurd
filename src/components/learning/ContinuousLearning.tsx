@@ -26,7 +26,7 @@ export const ContinuousLearning: React.FC = () => {
     <div className="p-4 sm:p-6 max-w-[1560px] mx-auto space-y-5">
       
       {/* Header Banner */}
-      <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="vg-hero rounded-2xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center ring-1 ring-purple-500/30">
             <Cpu className="w-6 h-6" />
@@ -51,7 +51,7 @@ export const ContinuousLearning: React.FC = () => {
       </div>
 
       {/* THE 4-STEP FEEDBACK LOOP DIAGRAM */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+      <div className="bg-card rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
             Closed Feedback Loop: PREDICT → VERIFY → PREVENT → LEARN
@@ -62,7 +62,7 @@ export const ContinuousLearning: React.FC = () => {
         </div>
 
         {/* Hero Demo Hotspot VG-1042 Closed Loop Card */}
-        <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-xl p-4 sm:p-5 border border-slate-800 shadow-md">
+        <div className="vg-panel-dark rounded-xl p-4 sm:p-5 shadow-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
             <div className="flex items-center gap-2">
               <span className="font-mono font-bold text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded text-xs">
@@ -153,7 +153,7 @@ export const ContinuousLearning: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* Metric 1: Prediction Precision */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
+        <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-500 font-medium">Predictive Precision</span>
             <TrendingUp className="w-4 h-4 text-emerald-600" />
@@ -168,7 +168,7 @@ export const ContinuousLearning: React.FC = () => {
         </div>
 
         {/* Metric 2: False Positive Reduction */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
+        <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-500 font-medium">False Alarm Rate</span>
             <ShieldCheck className="w-4 h-4 text-indigo-600" />
@@ -183,7 +183,7 @@ export const ContinuousLearning: React.FC = () => {
         </div>
 
         {/* Metric 3: Verification Feedback Samples */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
+        <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-500 font-medium">Feedback Samples Stored</span>
             <GitCommit className="w-4 h-4 text-purple-600" />
@@ -197,7 +197,7 @@ export const ContinuousLearning: React.FC = () => {
       </div>
 
       {/* RECENT CALIBRATION LOGS TABLE */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-card rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <h3 className="text-xs font-bold text-slate-900">
             Ground-Truth Verification Calibration Log

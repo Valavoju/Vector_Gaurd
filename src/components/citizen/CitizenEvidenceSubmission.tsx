@@ -159,7 +159,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
     <div className="w-full max-w-3xl mx-auto py-4 px-4 sm:px-6 space-y-6">
       
       {/* Title Header */}
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-2">
+      <div className="bg-card rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
@@ -206,7 +206,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
           </div>
         </div>
 
-        <label className="flex items-center gap-2 bg-white/80 hover:bg-white px-3 py-1.5 rounded-xl border border-amber-300 text-xs font-bold text-amber-950 cursor-pointer shrink-0 transition">
+        <label className="flex items-center gap-2 bg-card/80 hover:bg-card px-3 py-1.5 rounded-xl border border-amber-300 text-xs font-bold text-amber-950 cursor-pointer shrink-0 transition">
           <input
             type="checkbox"
             checked={isDroneRestrictedScenario}
@@ -218,7 +218,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
       </div>
 
       {/* MANDATORY CITIZEN DISCLAIMER BOX */}
-      <div className="bg-slate-900 text-slate-100 rounded-2xl p-4.5 sm:p-5 border border-slate-800 space-y-2">
+      <div className="vg-panel-dark rounded-2xl p-4.5 sm:p-5 space-y-2">
         <div className="flex items-center gap-2 text-amber-400 font-extrabold text-xs tracking-wider uppercase">
           <Info className="w-4 h-4" />
           <span>CITIZEN EVIDENCE IS SUPPORTING EVIDENCE ONLY</span>
@@ -229,7 +229,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
       </div>
 
       {/* Main Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-card rounded-2xl border border-slate-200/90 shadow-xs p-6 space-y-6">
         
         {/* Step 1: Evidence Type Selector */}
         <div className="space-y-3">
@@ -309,7 +309,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                         referrerPolicy="no-referrer"
                       />
                     </div>
-                    <div className="p-2 bg-white">
+                    <div className="p-2 bg-card">
                       <div className="text-[11px] font-bold text-slate-900 truncate">{sample.name}</div>
                       <div className="text-[9px] text-slate-500 truncate">{sample.type}</div>
                     </div>
@@ -337,7 +337,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="absolute bottom-2 left-2 bg-slate-950/80 text-white font-mono text-[10px] px-2 py-0.5 rounded backdrop-blur-xs">
+                  <span className="vg-island absolute bottom-2 left-2 bg-slate-950/80 text-white font-mono text-[10px] px-2 py-0.5 rounded backdrop-blur-xs">
                     SELECTED EVIDENCE
                   </span>
                 </>
@@ -408,7 +408,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
               <select
                 value={state}
                 onChange={(e) => handleStateChange(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-violet-500/20"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 focus:ring-violet-500/20"
               >
                 {ALL_INDIAN_STATES_AND_UTS.map(s => (
                   <option key={s.name} value={s.name}>{s.name}</option>
@@ -423,7 +423,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                 <select
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-violet-500/20"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 focus:ring-violet-500/20"
                 >
                   {cityList.map(c => (
                     <option key={c.name} value={c.name}>{c.name}</option>
@@ -458,7 +458,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                     if (errors.localArea) setErrors(prev => ({ ...prev, localArea: '' }));
                   }}
                   placeholder="e.g. Road No. 12, Banjara Hills"
-                  className={`w-full pl-9 pr-3 py-2.5 bg-slate-50 border rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 ${
+                  className={`w-full pl-9 pr-3 py-2.5 bg-slate-50 border rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 ${
                     errors.localArea ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-violet-500/20 focus:border-violet-500'
                   }`}
                 />
@@ -480,7 +480,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                 value={gpsCoordinates}
                 onChange={(e) => setGpsCoordinates(e.target.value)}
                 placeholder="e.g. 17.4156° N, 78.4350° E"
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-violet-500/20"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900 focus:outline-none focus:bg-card focus:ring-2 focus:ring-violet-500/20"
               />
             </div>
 
@@ -500,7 +500,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
               if (errors.description) setErrors(prev => ({ ...prev, description: '' }));
             }}
             placeholder="Describe what you observed (e.g. standing depth, foul odor, drainage block, visible mosquito larvae)..."
-            className={`w-full p-3 bg-slate-50 border rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-white focus:ring-2 leading-relaxed ${
+            className={`w-full p-3 bg-slate-50 border rounded-xl text-xs text-slate-900 focus:outline-none focus:bg-card focus:ring-2 leading-relaxed ${
               errors.description ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-violet-500/20 focus:border-violet-500'
             }`}
           />
@@ -520,7 +520,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
           <select
             value={linkedHotspotId}
             onChange={(e) => setLinkedHotspotId(e.target.value)}
-            className="bg-white border border-indigo-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="bg-card border border-indigo-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
           >
             <option value="">General Area (Unlinked)</option>
             <option value="VG-1042">VG-1042 • Hyderabad (Hero Hotspot)</option>
