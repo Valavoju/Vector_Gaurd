@@ -351,7 +351,7 @@ export const TechnicalArchitecture: React.FC = () => {
             <button
               onClick={handleHealthCheck}
               disabled={isCheckingHealth}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition flex items-center justify-center gap-2 active:scale-[0.97] disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-sky-400 ${isCheckingHealth ? 'animate-spin' : ''}`} />
               {isCheckingHealth ? 'Pinging Cloud DB...' : 'Run Live Health Check'}
@@ -466,7 +466,7 @@ export const TechnicalArchitecture: React.FC = () => {
               return (
                 <div 
                   key={table.key}
-                  className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                  className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md transition vg-lift flex flex-col justify-between space-y-4 group"
                 >
                   <div className="space-y-3">
                     

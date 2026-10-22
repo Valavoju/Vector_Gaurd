@@ -86,7 +86,7 @@ export const Sidebar: React.FC = () => {
         onClick={() => handleNavClick(item.view)}
         title={collapsed ? item.label : undefined}
         aria-current={active ? 'page' : undefined}
-        className={`group relative w-full flex items-center gap-2.5 rounded-xl text-[13px] font-semibold transition-all duration-200 ${
+        className={`group relative w-full flex items-center gap-2.5 rounded-xl text-[13px] font-semibold transition-[color,background-color,box-shadow] duration-200 ${
           collapsed ? 'justify-center p-2' : 'px-2.5 py-1.5'
         } ${
           active

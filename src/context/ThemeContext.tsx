@@ -5,15 +5,14 @@ export type ThemeMode = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: ThemeMode;
-  /** Toggle the theme. `origin` is the viewport point the liquid reveal grows from. */
+  /** Toggle the theme. `origin` is the viewport point the circular reveal grows from. */
   toggleTheme: (origin?: { x: number; y: number }) => void;
 }
 
 const STORAGE_KEY = 'vg-theme';
-const LIQUID_DURATION_MS = 950;
-// The mask blob is inset inside its box, so it must be scaled past the
-// farthest corner for the reveal to cover the whole viewport.
-const BLOB_COVER_FACTOR = 2.5;
+const REVEAL_DURATION_MS = 560;
+// iOS-like curve: starts fast so the click feels answered, settles softly.
+const REVEAL_EASING = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
@@ -70,40 +69,35 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (typeof document.startViewTransition !== 'function') {
       root.classList.add('vg-theme-fade');
       commit();
-      window.setTimeout(() => root.classList.remove('vg-theme-fade'), 500);
+      window.setTimeout(() => root.classList.remove('vg-theme-fade'), 260);
       return;
     }
 
     const x = origin?.x ?? window.innerWidth - 40;
     const y = origin?.y ?? 40;
-    const reach = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-    const size = reach * BLOB_COVER_FACTOR;
+    // Radius to the farthest viewport corner, so the circle covers everything.
+    const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
 
-    root.classList.add('vg-liquid');
+    root.classList.add('vg-theme-reveal');
     const transition = document.startViewTransition(commit);
 
     transition.ready
       .then(() => {
-        const keyframes: PropertyIndexedKeyframes = {
-          maskSize: ['0px 0px', `${size * 0.18}px ${size * 0.18}px`, `${size}px ${size}px`],
-          maskPosition: [`${x}px ${y}px`, `${x - size * 0.09}px ${y - size * 0.09}px`, `${x - size / 2}px ${y - size / 2}px`],
-          webkitMaskSize: ['0px 0px', `${size * 0.18}px ${size * 0.18}px`, `${size}px ${size}px`],
-          webkitMaskPosition: [`${x}px ${y}px`, `${x - size * 0.09}px ${y - size * 0.09}px`, `${x - size / 2}px ${y - size / 2}px`],
-          // A short "drip" hold at the start, then the flood fills the screen.
-          offset: [0, 0.22, 1],
-        };
-        root.animate(keyframes, {
-          duration: LIQUID_DURATION_MS,
-          easing: 'cubic-bezier(0.7, 0, 0.25, 1)',
-          pseudoElement: '::view-transition-new(root)',
-          fill: 'both',
-        });
+        root.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          {
+            duration: REVEAL_DURATION_MS,
+            easing: REVEAL_EASING,
+            pseudoElement: '::view-transition-new(root)',
+            fill: 'both',
+          },
+        );
       })
       .catch(() => {
         // Transition was skipped (e.g. tab hidden); the theme is already committed.
       });
 
-    transition.finished.finally(() => root.classList.remove('vg-liquid'));
+    transition.finished.finally(() => root.classList.remove('vg-theme-reveal'));
   }, []);
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;

@@ -27,7 +27,7 @@ export const Toaster: React.FC = () => {
           <div
             key={toast.id}
             role="status"
-            className="pointer-events-auto relative overflow-hidden bg-surface border border-slate-200 rounded-xl shadow-xl p-3 pl-4 flex items-start gap-2.5 animate-pop-in"
+            className="pointer-events-auto relative overflow-hidden bg-surface border border-slate-200 rounded-xl shadow-xl p-3 pl-4 flex items-start gap-2.5 origin-top-right animate-toast-in"
           >
             <span className={`absolute left-0 top-0 bottom-0 w-1 ${tone.bar}`} />
             <Icon className={`w-4.5 h-4.5 shrink-0 mt-0.5 ${tone.accent}`} />

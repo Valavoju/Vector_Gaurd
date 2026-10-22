@@ -66,7 +66,7 @@ export const HotspotDetailModal: React.FC = () => {
       <div 
         role="dialog"
         aria-modal="true"
-        className="bg-surface animate-pop-in w-full max-w-3xl rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-surface animate-modal-in w-full max-w-3xl rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         

@@ -248,7 +248,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                   key={opt.type}
                   type="button"
                   onClick={() => setEvidenceType(opt.type)}
-                  className={`text-left p-3.5 rounded-xl border transition-all ${
+                  className={`text-left p-3.5 rounded-xl border transition ${
                     isSelected 
                       ? 'bg-violet-50/80 border-violet-500 ring-2 ring-violet-500/20 shadow-xs' 
                       : 'bg-slate-50/60 border-slate-200 hover:border-slate-300'
@@ -295,7 +295,7 @@ export const CitizenEvidenceSubmission: React.FC<CitizenEvidenceSubmissionProps>
                       setDescription(sample.desc);
                       if (errors.image) setErrors(prev => ({ ...prev, image: '' }));
                     }}
-                    className={`group relative rounded-xl overflow-hidden border text-left transition-all ${
+                    className={`group relative rounded-xl overflow-hidden border text-left transition ${
                       isSelected 
                         ? 'ring-2 ring-violet-600 border-violet-600 shadow-sm' 
                         : 'border-slate-200 hover:border-slate-300'

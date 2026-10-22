@@ -106,7 +106,7 @@ export const AnalyticsDashboard: React.FC = () => {
       </div>
 
       {/* KPI Cards Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="vg-stagger grid grid-cols-2 lg:grid-cols-4 gap-4">
         
         <div className="bg-card rounded-2xl border border-slate-200 p-5 shadow-xs space-y-2">
           <div className="text-xs text-slate-500 font-medium">Preventive Risk Coverage</div>
@@ -187,7 +187,7 @@ export const AnalyticsDashboard: React.FC = () => {
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 h-2 rounded-[4px] overflow-hidden">
-                  <div className={`${level.fill} h-full rounded-r-[4px] transition-all duration-700`} style={{ width: `${pct(level.count)}%` }} />
+                  <div className={`${level.fill} h-full rounded-r-[4px] transition-[width] duration-500 ease-out`} style={{ width: `${pct(level.count)}%` }} />
                 </div>
               </div>
             ))}

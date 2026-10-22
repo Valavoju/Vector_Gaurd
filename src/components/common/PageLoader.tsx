@@ -3,7 +3,7 @@ import { BrandMark } from './BrandLogo';
 
 /** In-app loader shown while a lazily loaded view is fetched. */
 export const PageLoader: React.FC<{ label?: string }> = ({ label = 'Loading workspace' }) => (
-  <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-page-in" role="status" aria-live="polite">
+  <div className="p-4 sm:p-6 lg:p-8 space-y-6 animate-page-in [animation-delay:150ms]" role="status" aria-live="polite">
     <div className="flex items-center gap-4">
       <div className="relative w-12 h-12">
         <div className="absolute -inset-3 rounded-full bg-brand-500/25 blur-xl animate-pulse" />

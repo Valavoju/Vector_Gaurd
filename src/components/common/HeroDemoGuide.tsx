@@ -660,7 +660,7 @@ export const HeroDemoGuide: React.FC = () => {
 
   return (
     <div 
-      className={`fixed z-50 transition-all duration-300 pointer-events-auto ${
+      className={`fixed z-50 pointer-events-auto animate-pop-in ${
         positionSide === 'left'
           ? 'bottom-4 left-4 sm:left-6 max-w-[420px] w-[calc(100vw-32px)] sm:w-[420px]'
           : 'bottom-4 right-4 sm:right-6 max-w-[420px] w-[calc(100vw-32px)] sm:w-[420px]'
@@ -668,7 +668,7 @@ export const HeroDemoGuide: React.FC = () => {
       style={{ boxSizing: 'border-box' }}
     >
       {/* Floating Card Container */}
-      <div className="vg-island relative bg-slate-900/95 text-white border border-slate-700/90 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md transition-all">
+      <div className="vg-island relative bg-slate-900/95 text-white border border-slate-700/90 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md">
         
         {/* Header Bar */}
         <div className="flex items-center justify-between gap-2 px-3.5 sm:px-4 py-2.5 bg-slate-900 border-b border-slate-800">
@@ -742,7 +742,7 @@ export const HeroDemoGuide: React.FC = () => {
         {/* Progress Bar Line */}
         <div className="w-full bg-slate-800 h-1">
           <div 
-            className="bg-gradient-to-r from-amber-500 via-indigo-500 to-emerald-500 h-full transition-all duration-300"
+            className="bg-gradient-to-r from-amber-500 via-indigo-500 to-emerald-500 h-full transition-[width] duration-300 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>

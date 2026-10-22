@@ -182,7 +182,7 @@ const GlobalSearch: React.FC = () => {
       </kbd>
 
       {open && (
-        <div className="absolute left-0 right-0 mt-2 bg-surface border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50 max-h-[70vh] overflow-y-auto animate-pop-in">
+        <div className="absolute left-0 right-0 mt-2 bg-surface border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50 max-h-[70vh] overflow-y-auto">
           {results.length === 0 ? (
             <div className="px-3 py-6 text-center text-xs text-slate-500">No matches for “{query}”.</div>
           ) : (
@@ -392,7 +392,7 @@ export const Header: React.FC = () => {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-24px)] bg-surface border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-pop-in">
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-24px)] bg-surface border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 origin-top-right animate-pop-in">
               <div className="flex items-center justify-between px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 <span>Live alerts</span>
                 <span className="text-blue-600">{alerts.length} active</span>
@@ -447,7 +447,7 @@ export const Header: React.FC = () => {
           </button>
 
           {isRoleMenuOpen && (
-            <div role="menu" className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-surface border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 animate-pop-in">
+            <div role="menu" className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-surface border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right animate-pop-in">
               <div className="px-3.5 py-2.5 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 Switch role perspective
               </div>

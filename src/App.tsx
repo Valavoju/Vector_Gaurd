@@ -33,7 +33,7 @@ const ResponsibleAIModal = named(() => import('./components/responsible-ai/Respo
 const FieldOfficerApp = named(() => import('./components/field/FieldOfficerApp'), 'FieldOfficerApp');
 const CitizenPortal = named(() => import('./components/citizen/CitizenPortal'), 'CitizenPortal');
 
-const SPLASH_MIN_MS = 1400;
+const SPLASH_MIN_MS = 1100;
 
 /** Fades out the inline splash from index.html once the shell has mounted. */
 const useDismissSplash = () => {
@@ -43,7 +43,7 @@ const useDismissSplash = () => {
     const wait = Math.max(0, SPLASH_MIN_MS - performance.now());
     const t = window.setTimeout(() => {
       splash.classList.add('is-done');
-      window.setTimeout(() => splash.remove(), 700);
+      window.setTimeout(() => splash.remove(), 450);
     }, wait);
     return () => window.clearTimeout(t);
   }, []);
@@ -124,6 +124,18 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="h-dvh w-full max-w-full overflow-hidden flex flex-col font-sans text-slate-800 antialiased">
+      {/* The URL hash drives view routing, so focus <main> instead of following the anchor. */}
+      <a
+        href="#main-content"
+        className="vg-skip-link"
+        onClick={e => {
+          e.preventDefault();
+          document.getElementById('main-content')?.focus();
+        }}
+      >
+        Skip to content
+      </a>
+
       {/* 1. Official Disclaimer Banner */}
       <DisclaimerBanner />
 
@@ -139,7 +151,8 @@ const MainLayout: React.FC = () => {
 
           <main
             id="main-content"
-            className={`flex-1 min-h-0 w-full min-w-0 rounded-2xl ${
+            tabIndex={-1}
+            className={`outline-none flex-1 min-h-0 w-full min-w-0 rounded-2xl ${
               isMapView ? 'overflow-hidden border border-[var(--vg-glass-border)] shadow-[var(--vg-glass-shadow)]' : 'overflow-y-auto overflow-x-hidden'
             }`}
           >

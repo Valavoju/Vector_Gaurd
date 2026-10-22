@@ -225,7 +225,7 @@ export const VerificationCenter: React.FC = () => {
                     <div
                       key={task.task_id}
                       onClick={() => setSelectedTaskId(task.task_id)}
-                      className={`bg-card rounded-xl p-4 border cursor-pointer transition-all ${
+                      className={`bg-card rounded-xl p-4 border cursor-pointer transition vg-pressable ${
                         isSelected 
                           ? 'border-indigo-600 ring-2 ring-indigo-500/20 shadow-md' 
                           : 'border-slate-200 hover:border-slate-300 shadow-xs'
@@ -463,7 +463,7 @@ export const VerificationCenter: React.FC = () => {
                         id="approve-verification-btn"
                         type="button"
                         onClick={handleApprove}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-95"
+                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-[0.97]"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>APPROVE INTERVENTION & RESOLVE</span>
@@ -539,7 +539,7 @@ export const VerificationCenter: React.FC = () => {
                     <div
                       key={submission.submissionId}
                       onClick={() => setSelectedCitizenId(submission.submissionId)}
-                      className={`bg-card rounded-xl p-4 border cursor-pointer transition-all ${
+                      className={`bg-card rounded-xl p-4 border cursor-pointer transition vg-pressable ${
                         isSelected 
                           ? 'border-violet-600 ring-2 ring-violet-500/20 shadow-md' 
                           : 'border-slate-200 hover:border-slate-300 shadow-xs'
@@ -733,7 +733,7 @@ export const VerificationCenter: React.FC = () => {
                         id="approve-citizen-evidence-btn"
                         type="button"
                         onClick={handleApproveCitizen}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-extrabold text-white bg-violet-600 hover:bg-violet-700 shadow-md shadow-violet-600/20 transition active:scale-95"
+                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-extrabold text-white bg-violet-600 hover:bg-violet-700 shadow-md shadow-violet-600/20 transition active:scale-[0.97]"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>APPROVE AS SUPPORTING EVIDENCE</span>

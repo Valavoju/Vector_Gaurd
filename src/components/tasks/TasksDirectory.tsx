@@ -76,7 +76,7 @@ export const TasksDirectory: React.FC = () => {
           <button
             id="dispatch-open-hotspot-btn"
             onClick={() => setDispatchModalHotspotId(openHotspots[0].hotspot_id)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition active:scale-95 shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm transition active:scale-[0.97] shrink-0"
           >
             <Plus className="w-4 h-4 shrink-0" />
             <span>Dispatch Next Open Hotspot ({openHotspots[0].hotspot_id})</span>
@@ -119,13 +119,13 @@ export const TasksDirectory: React.FC = () => {
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 text-xs font-semibold uppercase tracking-wider">
               <tr>
-                <th className="p-3.5 sm:px-4 sm:py-3">Task ID</th>
-                <th className="p-3.5 sm:px-4 sm:py-3">Hotspot & Location</th>
-                <th className="p-3.5 sm:px-4 sm:py-3">Priority & Action</th>
-                <th className="p-3.5 sm:px-4 sm:py-3">Assigned Officer / Team</th>
-                <th className="p-3.5 sm:px-4 sm:py-3">Deadline</th>
-                <th className="p-3.5 sm:px-4 sm:py-3">Status</th>
-                <th className="p-3.5 sm:px-4 sm:py-3 text-right">Actions</th>
+                <th className="p-3.5 sm:px-3 sm:py-3">Task ID</th>
+                <th className="p-3.5 sm:px-3 sm:py-3">Hotspot & Location</th>
+                <th className="p-3.5 sm:px-3 sm:py-3">Priority & Action</th>
+                <th className="p-3.5 sm:px-3 sm:py-3">Assigned Officer / Team</th>
+                <th className="p-3.5 sm:px-3 sm:py-3">Deadline</th>
+                <th className="p-3.5 sm:px-3 sm:py-3">Status</th>
+                <th className="p-3.5 sm:px-3 sm:py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -140,50 +140,50 @@ export const TasksDirectory: React.FC = () => {
                   <tr key={task.task_id} className="hover:bg-slate-50/80 transition">
                     
                     {/* Task ID */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 font-mono font-bold text-slate-900 whitespace-nowrap">
+                    <td className="p-3.5 sm:px-3 sm:py-3.5 font-mono font-bold text-slate-900 whitespace-nowrap">
                       {task.task_id}
                     </td>
 
                     {/* Hotspot & Location */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5">
+                    <td className="p-3.5 sm:px-3 sm:py-3.5">
                       <div className="font-bold text-blue-700">{task.hotspot_id}</div>
-                      <div className="text-slate-800 font-medium truncate max-w-[200px]">{task.location}</div>
+                      <div className="text-slate-800 font-medium truncate max-w-[180px]" title={task.location}>{task.location}</div>
                       <div className="text-[11px] text-slate-400">{task.ward}</div>
                     </td>
 
                     {/* Priority & Action */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 max-w-xs">
+                    <td className="p-3.5 sm:px-3 sm:py-3.5 max-w-[220px]">
                       <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-1 ${PRIORITY_BADGE[task.priority] ?? PRIORITY_BADGE.Medium}`}>
                         {task.priority} Priority
                       </span>
-                      <div className="text-slate-700 text-xs font-medium truncate">{task.recommended_action}</div>
+                      <div className="text-slate-700 text-xs font-medium truncate" title={task.recommended_action}>{task.recommended_action}</div>
                     </td>
 
                     {/* Assigned Officer */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 min-w-[160px]">
+                    <td className="p-3.5 sm:px-3 sm:py-3.5 min-w-[140px] max-w-[200px]">
                       <div className="font-semibold text-slate-900">{task.assigned_officer}</div>
                       <div className="text-[11px] text-slate-500">{task.assigned_team}</div>
                     </td>
 
                     {/* Deadline */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 text-xs text-slate-600 whitespace-nowrap" title={task.deadline}>
+                    <td className="p-3.5 sm:px-3 sm:py-3.5 text-xs text-slate-600 min-w-[110px] tabular-nums" title={task.deadline}>
                       {formatDeadline(task.deadline)}
                     </td>
 
                     {/* Status */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5">
+                    <td className="p-3.5 sm:px-3 sm:py-3.5">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold whitespace-nowrap ${
                         task.status === 'RESOLVED' ? 'bg-emerald-100 text-emerald-800' :
                         task.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-800' :
                         task.status === 'AWAITING_VERIFICATION' ? 'bg-purple-100 text-purple-800' :
                         'bg-amber-100 text-amber-800'
                       }`}>
-                        {task.status.replace(/_/g, ' ')}
+                        {task.status.charAt(0) + task.status.slice(1).replace(/_/g, ' ').toLowerCase()}
                       </span>
                     </td>
 
                     {/* Actions */}
-                    <td className="p-3.5 sm:px-4 sm:py-3.5 text-right">
+                    <td className="p-3.5 sm:px-3 sm:py-3.5 text-right">
                       <button
                         onClick={() => {
                           setSelectedHotspotId(task.hotspot_id);
@@ -248,7 +248,7 @@ export const TasksDirectory: React.FC = () => {
                     Officer: <span className="font-semibold text-slate-700">{task.assigned_officer}</span> ({task.assigned_team})
                   </div>
                   <div className="text-slate-500 text-[11px] font-mono">
-                    Deadline: {task.deadline}
+                    Deadline: {formatDeadline(task.deadline)}
                   </div>
                 </div>
 

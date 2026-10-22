@@ -135,7 +135,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
             <img 
               src={beforeImageUrl} 
               alt="Before Intervention Evidence" 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             />
 
             {/* Expand button on hover */}
@@ -260,7 +260,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
             <img 
               src={afterImageUrl} 
               alt="After Intervention Evidence" 
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
             />
 
             {/* Expand button on hover */}
@@ -377,7 +377,7 @@ export const RealisticVisualEvidence: React.FC<RealisticVisualEvidenceProps> = (
               <div 
                 key={angle.id}
                 onClick={() => setSelectedAngle(angle)}
-                className="vg-island group relative bg-slate-950 rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-500 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col"
+                className="vg-island group relative bg-slate-950 rounded-xl overflow-hidden border border-slate-200 hover:border-indigo-500 shadow-2xs hover:shadow-md transition cursor-pointer flex flex-col"
               >
                 {/* Photo */}
                 <div className="relative aspect-4/3 overflow-hidden">

@@ -78,6 +78,46 @@ type BasemapStyle = 'SATELLITE' | 'HYBRID' | 'TERRAIN' | 'TOPO' | 'DARK';
 type GeoHierarchyLevel = 'INDIA' | 'STATE' | 'CITY';
 type RightPanelTab = 'OVERVIEW' | 'RISK_FACTORS' | 'EVIDENCE' | 'TASK_HISTORY';
 
+/** Teardrop pin for one hotspot. The ID label shows on hover, or always for the selected pin. */
+const buildPinIcon = (hotspotId: string, rawLevel: string | undefined, score: number, isSelected: boolean) => {
+  let level = rawLevel?.toUpperCase();
+  if (!level || !['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].includes(level)) {
+    if (score >= 81) level = 'CRITICAL';
+    else if (score >= 61) level = 'HIGH';
+    else if (score >= 31) level = 'MODERATE';
+    else level = 'LOW';
+  }
+
+  // Shared severity scale (utils/riskStyles) so pins match every other view.
+  const pinColor = riskStyle(level).hex;
+
+  const html = `
+    <div class="group relative cursor-pointer transition-transform duration-200 ease-out origin-bottom ${isSelected ? 'scale-125' : 'hover:scale-110'}">
+      ${isSelected ? `
+        <div class="absolute -inset-2.5 rounded-full animate-ping opacity-40 pointer-events-none" style="background-color: ${pinColor}"></div>
+        <div class="absolute -inset-1.5 rounded-full opacity-60 pointer-events-none" style="background-color: ${pinColor}"></div>
+      ` : ''}
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="${isSelected ? '32' : '26'}" height="${isSelected ? '40' : '34'}" class="drop-shadow-md">
+        <path d="M12 0 C5.373 0 0 5.373 0 12 C0 21 12 32 12 32 C12 32 24 21 24 12 C24 5.373 18.627 0 12 0 Z" fill="${pinColor}" stroke="#ffffff" stroke-width="2"/>
+        <circle cx="12" cy="11" r="5" fill="#ffffff" />
+        <text x="12" y="13.5" font-size="7" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="#0f172a">
+          ${score}
+        </text>
+      </svg>
+      <div class="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-1.5 py-0.5 rounded bg-slate-900/90 text-[9px] font-mono font-bold text-white whitespace-nowrap shadow-sm pointer-events-none border border-slate-700/80 transition-opacity duration-150 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}">
+        ${hotspotId}
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    html,
+    className: 'custom-gps-pin',
+    iconSize: [isSelected ? 32 : 26, isSelected ? 40 : 34],
+    iconAnchor: [isSelected ? 16 : 13, isSelected ? 40 : 34],
+  });
+};
+
 export const RiskMap: React.FC = () => {
   const { 
     hotspots: rawHotspots, 
@@ -99,6 +139,8 @@ export const RiskMap: React.FC = () => {
   const baseTileLayerRef = useRef<L.TileLayer | null>(null);
   const labelsTileLayerRef = useRef<L.TileLayer | null>(null);
   const markersGroupRef = useRef<L.LayerGroup | null>(null);
+  const markerIndexRef = useRef(new Map<string, { marker: L.Marker; level?: string; score: number }>());
+  const selectedPinRef = useRef<string | null>(null);
 
   // Geographic Hierarchy State
   const [geoLevel, setGeoLevel] = useState<GeoHierarchyLevel>('INDIA');
@@ -421,56 +463,25 @@ export const RiskMap: React.FC = () => {
     };
   }, []);
 
-  // 2. Render Markers & Teardrop GPS Pins for ALL Risk Levels (Critical, High, Moderate, Low)
+  // 2. Render Markers & Teardrop GPS Pins for ALL Risk Levels (Critical, High, Moderate, Low).
+  // Markers are rebuilt only when the filtered set changes; selecting a pin
+  // swaps just the old and new pin icons (effect 3), so clicks stay instant.
   useEffect(() => {
-    if (!mapInstanceRef.current || !markersGroupRef.current) return;
-    markersGroupRef.current.clearLayers();
+    const group = markersGroupRef.current;
+    if (!mapInstanceRef.current || !group) return;
+    group.clearLayers();
+    const index = markerIndexRef.current;
+    index.clear();
 
     filteredHotspots.forEach(hotspot => {
-      const isSelected = hotspot.hotspot_id === currentHotspotId;
       const score = Math.round(Number(hotspot.breeding_risk_score ?? (hotspot as any).risk_score ?? 0));
+      const isSelected = hotspot.hotspot_id === selectedPinRef.current;
 
-      let level = hotspot.risk_level;
-      if (!level || !['CRITICAL', 'HIGH', 'MODERATE', 'LOW'].includes(level.toUpperCase())) {
-        if (score >= 81) level = 'CRITICAL';
-        else if (score >= 61) level = 'HIGH';
-        else if (score >= 31) level = 'MODERATE';
-        else level = 'LOW';
-      } else {
-        level = level.toUpperCase() as any;
-      }
-
-      // Exact color encoding for all 4 risk levels
-      // Shared severity scale (utils/riskStyles) so pins match every other view.
-      const pinColor = riskStyle(level).hex;
-
-      const iconHtml = `
-        <div class="relative cursor-pointer transition-transform duration-200 ${isSelected ? 'scale-125 z-50' : 'hover:scale-110 z-10'}">
-          ${isSelected ? `
-            <div class="absolute -inset-2.5 rounded-full animate-ping opacity-40 pointer-events-none" style="background-color: ${pinColor}"></div>
-            <div class="absolute -inset-1.5 rounded-full opacity-60 pointer-events-none" style="background-color: ${pinColor}"></div>
-          ` : ''}
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32" width="${isSelected ? '32' : '26'}" height="${isSelected ? '40' : '34'}" class="drop-shadow-md">
-            <path d="M12 0 C5.373 0 0 5.373 0 12 C0 21 12 32 12 32 C12 32 24 21 24 12 C24 5.373 18.627 0 12 0 Z" fill="${pinColor}" stroke="#ffffff" stroke-width="2"/>
-            <circle cx="12" cy="11" r="5" fill="#ffffff" />
-            <text x="12" y="13.5" font-size="7" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="#0f172a">
-              ${score}
-            </text>
-          </svg>
-          <div class="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-1.5 py-0.5 rounded bg-slate-900/90 text-[9px] font-mono font-bold text-white whitespace-nowrap shadow-sm pointer-events-none border border-slate-700/80">
-            ${hotspot.hotspot_id}
-          </div>
-        </div>
-      `;
-
-      const customIcon = L.divIcon({
-        html: iconHtml,
-        className: 'custom-gps-pin',
-        iconSize: [isSelected ? 32 : 26, isSelected ? 40 : 34],
-        iconAnchor: [isSelected ? 16 : 13, isSelected ? 40 : 34]
+      const marker = L.marker([hotspot.latitude, hotspot.longitude], {
+        icon: buildPinIcon(hotspot.hotspot_id, hotspot.risk_level, score, isSelected),
+        zIndexOffset: isSelected ? 1000 : 0,
+        riseOnHover: true,
       });
-
-      const marker = L.marker([hotspot.latitude, hotspot.longitude], { icon: customIcon });
       marker.on('click', () => {
         setSelectedHotspotId(hotspot.hotspot_id);
         setSelectedDetailHotspotId?.(hotspot.hotspot_id);
@@ -479,9 +490,26 @@ export const RiskMap: React.FC = () => {
         }
       });
 
-      marker.addTo(markersGroupRef.current!);
+      marker.addTo(group);
+      index.set(hotspot.hotspot_id, { marker, level: hotspot.risk_level, score });
     });
-  }, [filteredHotspots, currentHotspotId, setSelectedHotspotId, setSelectedDetailHotspotId]);
+  }, [filteredHotspots, setSelectedHotspotId, setSelectedDetailHotspotId]);
+
+  // 3. Selection change: restyle only the previously and newly selected pins.
+  useEffect(() => {
+    const prev = selectedPinRef.current;
+    const next = currentHotspotId ?? null;
+    if (prev === next) return;
+    const restyle = (id: string | null, isSelected: boolean) => {
+      const entry = id ? markerIndexRef.current.get(id) : undefined;
+      if (!id || !entry) return;
+      entry.marker.setIcon(buildPinIcon(id, entry.level, entry.score, isSelected));
+      entry.marker.setZIndexOffset(isSelected ? 1000 : 0);
+    };
+    restyle(prev, false);
+    restyle(next, true);
+    selectedPinRef.current = next;
+  }, [currentHotspotId]);
 
   return (
     <div className="w-full h-full min-h-[560px] text-slate-800 flex flex-col overflow-hidden relative select-none">
@@ -1195,7 +1223,7 @@ export const RiskMap: React.FC = () => {
               <button
                 id="right-panel-dispatch-task-btn"
                 onClick={() => setDispatchModalHotspotId(currentHotspot.hotspot_id)}
-                className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer active:scale-95"
+                className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer active:scale-[0.97]"
               >
                 <ClipboardList className="w-4 h-4" />
                 <span>Dispatch Task</span>
@@ -1204,7 +1232,7 @@ export const RiskMap: React.FC = () => {
               <button
                 id="right-panel-view-hotspots-btn"
                 onClick={() => setActiveView('HOTSPOTS')}
-                className="w-full py-2.5 px-3 rounded-xl bg-card hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-95"
+                className="w-full py-2.5 px-3 rounded-xl bg-card hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-[0.97]"
               >
                 <span>View Hotspots</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1237,7 +1265,7 @@ export const RiskMap: React.FC = () => {
           <button
             id="mobile-open-intel-btn"
             onClick={() => setIsMobilePanelOpen(true)}
-            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 shrink-0 shadow-sm active:scale-95 transition cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 shrink-0 shadow-sm active:scale-[0.97] transition cursor-pointer"
           >
             <span>Intel & Action</span>
             <ChevronUp className="w-3.5 h-3.5" />
@@ -1341,7 +1369,7 @@ export const RiskMap: React.FC = () => {
                     setDispatchModalHotspotId(currentHotspot.hotspot_id);
                     setIsMobilePanelOpen(false);
                   }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer active:scale-95"
+                  className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer active:scale-[0.97]"
                 >
                   <ClipboardList className="w-4 h-4" />
                   <span>Dispatch Task</span>
@@ -1353,7 +1381,7 @@ export const RiskMap: React.FC = () => {
                     setActiveView('HOTSPOTS');
                     setIsMobilePanelOpen(false);
                   }}
-                  className="w-full py-2.5 px-3 rounded-xl bg-card hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-95"
+                  className="w-full py-2.5 px-3 rounded-xl bg-card hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition cursor-pointer active:scale-[0.97]"
                 >
                   <span>All Hotspots</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />

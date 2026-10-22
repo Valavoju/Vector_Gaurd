@@ -52,7 +52,7 @@ export const ExifVerificationBadge: React.FC<ExifVerificationBadgeProps> = ({
   const isMatched = metadata.isGeoMatched;
 
   return (
-    <div className={`rounded-lg border transition-all text-xs font-mono ${
+    <div className={`rounded-lg border transition text-xs font-mono ${
       isMatched 
         ? 'bg-emerald-50/30 border-emerald-200/60 text-slate-800' 
         : 'bg-amber-50/30 border-amber-200/60 text-slate-800'

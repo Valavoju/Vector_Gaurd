@@ -67,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
           <button
             id="launch-gis-map-top-btn"
             onClick={() => setActiveView('RISK_MAP')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-xs transition active:scale-[0.97]"
           >
             <MapPin className="w-4 h-4" />
             <span>Launch GIS Map</span>
@@ -86,7 +86,7 @@ export const AdminDashboard: React.FC = () => {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
+        <div className="vg-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
           
           {/* 01 PREDICT */}
           <button 
@@ -168,7 +168,7 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {/* 3. KEY OPERATIONAL KPIs (5 Equal Cards, Height ~105-115px) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="vg-stagger grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         
         {/* Critical Risk */}
         <div 

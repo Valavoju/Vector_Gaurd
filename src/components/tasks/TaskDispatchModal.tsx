@@ -63,7 +63,7 @@ export const TaskDispatchModal: React.FC = () => {
       <div 
         role="dialog"
         aria-modal="true"
-        className="bg-surface animate-pop-in w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in zoom-in-95 duration-150"
+        className="bg-surface animate-modal-in w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         
@@ -218,7 +218,7 @@ export const TaskDispatchModal: React.FC = () => {
               <button
                 id="create-task-submit-btn"
                 type="submit"
-                className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-95"
+                className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition active:scale-[0.97]"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>CREATE TASK & DISPATCH</span>
